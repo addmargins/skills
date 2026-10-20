@@ -1,0 +1,21 @@
+{
+  "name": "addmargins",
+  "owner": {
+    "name": "addmargins"
+  },
+  "metadata": {
+    "description": "Claude Code skills by addmargins"
+  },
+  "plugins": [
+    {
+      "name": "addmargins",
+      "description": "Skills that turn rough ideas into clear intent before specification and implementation",
+      "homepage": "https://github.com/addmargins/skills",
+      "license": "MIT",
+      "source": "./",
+      "skills": [
+        "./skills/engineering/"
+      ]
+    }
+  ]
+}
