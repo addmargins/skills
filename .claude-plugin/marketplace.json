@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "addmargins",
-      "description": "Skills that turn rough ideas into clear intent before specification and implementation",
+      "description": "Skills that turn rough ideas into clear intent, and intent into reviewable specs, before implementation",
       "homepage": "https://github.com/addmargins/skills",
       "license": "MIT",
       "source": "./",

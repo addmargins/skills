@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: flags-policy-conflicts-korean
+expected_outcome: |
+  A Korean spec saved at docs/specs/0007-annual-plan-self-cancel.md that raises the policy conflicts and system limits the intent doesn't mention as open questions addressed to their named owners, carries the intent's open questions forward, and decides none of them itself.
+context:
+  scaffold_script: place-files.sh

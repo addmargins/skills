@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: finds-hidden-gaps-english
+expected_outcome: |
+  An English spec saved at docs/specs/0003-monthly-invoice-export.md that keeps what the intent settled (the column list), applies SEC-04, and raises the gaps the intent misses (month boundary time zone, void invoices, the missing finance:export permission) as open questions without deciding them.
+context:
+  scaffold_script: place-files.sh

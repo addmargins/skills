@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: stops-on-uncheckable-outcome
+expected_outcome: |
+  No spec file is written. The response says the intent's desired outcome can't be checked (and the problem is vague), and points to clarify-intent or revising the intent first.
+context:
+  scaffold_script: place-files.sh
