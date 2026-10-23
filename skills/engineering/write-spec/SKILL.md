@@ -122,7 +122,7 @@ Save the draft at the path in step 7, then check it in this order.
    - Each fact still matches the workspace. Recheck them as the technical lead would.
 3. Give the saved file to fresh readers, as [references/fresh-readers.md](references/fresh-readers.md) describes. You have read the intent, the policies, and the code, so you fill gaps without seeing them. The test is about a reader who has only the spec. Run three subagents at once, each with only what its reviewer would have. The implementer gets only the spec. The originator gets the spec and the intent. The policy reader gets the spec and every policy text. Judge each finding yourself:
    - If a source settles it, write or fix the rule, with the source.
-   - If no source settles it, add an open question.
+   - If no source settles it, add an open question, but only if it passes the check in step 4. Readers raise padding too.
    - If nobody outside engineering would notice, list it under Left to engineering.
    - If the spec already settles it, dismiss it. If the reader missed it because it was hard to find, move or rewrite it.
 
