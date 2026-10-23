@@ -8,7 +8,7 @@ Fill in names and roles from the spec's Reviewers table. When the intent names n
 
 - A first draft's first round runs all three readers. Skip the policy reader only when you found no policy, privacy, security, compliance, or legal document at all, and say so.
 - Wait for every reader in a round to return before you judge any finding.
-- After you apply findings, check the edited file again (SKILL.md step 6, checks 1–4), then run the next round: the implementer, plus each reader whose part changed. Stop after a round that yields nothing you apply, or after three rounds.
+- After you apply findings, check the edited file again (SKILL.md step 6, checks 1–4), then run the next round: a new implementer, plus each reader whose part changed. Stop after a round that yields nothing you apply, or after three rounds.
 - On a revision that changes rules or cases, run at least one round: the implementer, plus the policy reader when a policy owner answered, and the originator when scope or an outcome changed.
 
 ## Judging findings
@@ -18,12 +18,12 @@ Fill in names and roles from the spec's Reviewers table. When the intent names n
 - If nobody outside engineering would notice, list it under Left to engineering.
 - If the spec already settles it, dismiss it. If the reader missed it because it was hard to find, move or rewrite it.
 
-Never resolve a finding by choosing behavior, or with a hedge such as "not yet confirmed" or "if this turns out to be X, ask Y". Each finding ends as a sourced rule, a question, a fact with a named confirmer, or a dismissal with its reason.
+Note each finding and how it ended, for the report. Never resolve a finding by choosing behavior, or with a hedge such as "not yet confirmed" or "if this turns out to be X, ask Y". Each finding ends as a sourced rule, a question, a fact with a named confirmer, or a dismissal with its reason.
 
-- A finding that needs a decision with a different owner or different consequences from an existing question becomes its own question. Widen an existing question only when the same owner decides it among the same options.
+- A finding that needs a decision with a different owner or different consequences from an existing question becomes its own question. Widen an existing question only when the same owner decides it among the same options. A line such as "X must also be decided" inside a question, with no options of its own, is a new question.
 - When a finding becomes a question, change every other sentence that already settles the point so it names the question instead.
 - A case row you add gets a result only when the rules it cites compute it.
-- When the policy reader says a row settles how a policy's words are read, mark the row as depending on that reading, or quote the words that allow only one reading.
+- When the policy reader says a row settles how a policy's words are read, give the row's result under each reading and name the question, or quote the words that allow only one reading.
 - When the originator reader reports something dropped or narrowed, restore the intent's wording or ask the originator.
 
 ## Implementer
