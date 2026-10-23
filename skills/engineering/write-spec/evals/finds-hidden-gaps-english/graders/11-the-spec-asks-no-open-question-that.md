@@ -4,4 +4,4 @@ focus: trace
 weight: 1
 ---
 
-The spec asks no open question that the intent's or SEC-04's plain words already answer, and none about activity the change doesn't build, such as how the accountants pass the file to the auditor.
+The spec's Open questions section has no question that the intent's or SEC-04's plain words already answer, and none about activity the change doesn't build, such as how the accountants pass the file to the auditor. A one-line note under Scope, at the edges, naming who should settle such an item, is allowed.
