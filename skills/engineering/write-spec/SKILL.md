@@ -23,7 +23,7 @@ Hold the spec to one test. Would someone working only from this spec have to dec
 
 ### 1. Find the intent
 
-Take the intent document from the invocation arguments. If there is none, list each `docs/intents/` in the workspace and ask which document to use, as a choice question. If the document is marked `Superseded by:`, use the one it names, and say so.
+Take the intent document from the invocation arguments. If there is none, list each `docs/intents/` in the workspace and ask which document to use, as a choice question. If the document is marked `Superseded by:`, use the one it names, and say so. If the intent you use has a `Supersedes:` line and the intent it replaces already has a spec, write a new spec and follow the superseding rule in [references/revising.md](references/revising.md).
 
 Then check these, in this order:
 
@@ -122,13 +122,13 @@ Save the draft at the path in step 7, then check it in this order.
    - If nobody outside engineering would notice, list it under Left to engineering.
    - If the spec already settles it, dismiss it. If the reader missed it because it was hard to find, move or rewrite it.
 
-   Never resolve a finding by choosing behavior. Then run another round with new readers: the implementer, plus any reader whose part changed. Stop after a round that yields nothing you apply, or after three rounds, and report what the last round raised that you didn't apply. No reviewer has seen the draft yet, so you may renumber while you apply findings.
+   Never resolve a finding by choosing behavior. Then run another round with new readers: the implementer, plus any reader whose part changed. Stop after a round that yields nothing you apply, or after three rounds, and report what the last round raised that you didn't apply. On a first draft, before any reviewer has seen it, you may renumber while you apply findings. Once a spec has been saved for reviewers, never renumber.
 
    If subagents aren't available, make one pass yourself. Reread only the saved file as the implementer, and recheck every calculated case against the policy text for words that read two ways. Add only findings that pass the step 4 check, and say in your report that no fresh reader ran.
 
 ### 7. Save and report
 
-Save the spec beside the intent: for `<dir>/docs/intents/NNNN-<slug>.md`, write `<dir>/docs/specs/NNNN-<slug>.md`. Create `docs/specs/` if it doesn't exist. The shared file name pairs the two, so neither needs a link added. Don't modify the intent, the policies, or earlier specs.
+Save the spec beside the intent: for `<dir>/docs/intents/NNNN-<slug>.md`, write `<dir>/docs/specs/NNNN-<slug>.md`. Create `docs/specs/` if it doesn't exist. The shared file name pairs the two, so neither needs a link added. Don't modify the intent, the policies, or earlier specs, except for the `Superseded by:` line that the superseding rule adds to a replaced spec.
 
 Set the status to Draft. Then tell the user, in a few lines:
 
