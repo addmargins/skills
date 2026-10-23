@@ -1,0 +1,3 @@
+- Use pnpm.
+- Tests sit next to the file as *.test.ts.
+- Never commit secrets.

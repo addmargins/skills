@@ -1,0 +1,8 @@
+roles:
+  support:
+    permissions: [invoices:read, customers:read]
+  finance:
+    # assigned to the two accountants
+    permissions: [invoices:read, invoices:mark_paid, customers:read]
+  admin:
+    permissions: ["*"]
