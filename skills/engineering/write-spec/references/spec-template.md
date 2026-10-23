@@ -99,7 +99,7 @@ Read and not applicable: <Each policy you read that doesn't apply, with a few wo
 
 **Summary.** Write it in your own words, not the intent's. The originator reviews this paragraph, and a misreading shows up only in your own words. Keep numbers, names, and dates as the intent gives them.
 
-**Scope.** Take it from the intent, with the intent's reasons. "At the edges" lists, without widening the scope, people or channels the scope excludes that a policy or a fact still reaches. An example is a customer who signed up in an app the intent leaves out, when a policy says customers cancel where they signed up.
+**Scope.** Take it from the intent, with the intent's reasons. "At the edges" lists, without widening the scope, people or channels the scope excludes that a policy or a fact still reaches. An example is members of a partner club who use the same booking screen, when the intent covers only the club's own members but a policy covers everyone who books.
 
 **Reviewers.** This table is the only index of the open questions. Every open question appears in the row of each person who answers or confirms it. Take names from the intent, the policy documents, or the workspace; never guess one. Each row tells a reviewer what to read without reading everything.
 

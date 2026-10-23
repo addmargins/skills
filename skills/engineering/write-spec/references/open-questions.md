@@ -13,7 +13,7 @@ Write a question wherever someone working only from the spec would have to decid
 - a threshold whose relevance depends on a real figure the workspace lacks;
 - a reader's finding that the sources don't settle.
 
-Don't write one when the workspace already answers it. State the answer as a rule or a fact, with its source, so a reader can still correct it. Don't write one for a choice nobody outside engineering would notice; list it under Left to engineering. That includes a choice where every option meets the rules and checks the reviewers set: list it with the check that bounds it. Don't write one about something this change doesn't build or touch, such as what staff do with a file after they download it. If it matters, give it a line under Scope, at the edges.
+Don't write one when the workspace already answers it. State the answer as a rule or a fact, with its source, so a reader can still correct it. Don't write one for a choice nobody outside engineering would notice; list it under Left to engineering. That includes a choice where every option meets the rules and checks the reviewers set: list it with the check that bounds it. Don't write one about something this change doesn't build or touch, such as how members share a booking confirmation with friends. If it matters, give it a line under Scope, at the edges.
 
 Ask one thing per question. Two decisions with different owners or different consequences are two questions, even when they concern the same screen.
 
@@ -22,7 +22,7 @@ Ask one thing per question. Two decisions with different owners or different con
 Write the field labels in the spec's language. In a Korean spec, use the requester's own wording for the three parts: 무엇이 불명확한가? / 그 답에 따라 무엇이 달라지는가? / 무엇을 확인하거나 결정하면 해결되는가?
 
 - **Short name.** The heading: `Q<n>. <a few words naming the decision>`. Other sections refer to the question by this ID and name.
-- **What is unclear.** Name the specific gap, and quote or cite the words that leave it open. State in plain words the fact or rule it depends on, with its ID and short name, so the question reads without the rest of the spec. "The policy is unclear" is not a gap. "LEG-2026-14 §2 counts a step as an action that moves the customer to the next screen, and doesn't say whether the button that opens the cancel flow is one" is.
+- **What is unclear.** Name the specific gap, and quote or cite the words that leave it open. State in plain words the fact or rule it depends on, with its ID and short name, so the question reads without the rest of the spec. "The policy is unclear" is not a gap. "BOOK-02 §2 takes booking rights from members who 'don't show up', and doesn't say whether arriving 15 minutes late counts" is.
 - **What changes depending on the answer.** Be concrete: who is affected, what they see or receive, which amounts change, which rules and cases change, and what else the answer forces. This field is what lets a non-engineer judge how much the question matters.
 - **What would resolve it.** Say who must confirm or decide what, and in what form: a yes or no, a choice among the options, a number, a rule, or a document. If a fact must be confirmed first, say who confirms it.
 - **Who answers.** A role and a name, taken from the policy's owner line, the intent, or the workspace. Product behavior and scope go to the product owner. What a policy requires, and how its words are read, go to that policy's owner. A conflict between two policies goes to both owners, routed by the product owner. Whether the spec solves the problem goes to the originator. If you can't find an owner, write "the product owner assigns one". Never guess a name.
@@ -44,13 +44,13 @@ When you can't tell which applies, choose Blocks planning. Holding up planning c
 
 ## How questions fail
 
-- "Need to check the refund policy with finance." It has none of the three parts, so the owner doesn't know what to answer or why it matters.
+- "Need to check the cancellation policy with the front desk." It has none of the three parts, so the owner doesn't know what to answer or why it matters.
 - "Should late cancellations count as no-shows, be ignored, or stay open?" The options are hidden in a sentence, and nothing says what each one costs.
-- "Should `E_PARTIAL_CANCEL_EXPIRED` fall back to a bank transfer?" Only an engineer can read it, and it decides the fallback in the course of asking.
-- "Who answers: Finance / Legal." The policies name people. A question addressed to no one in particular waits for everyone and is answered by no one.
-- A recommendation on whether the marketing policy or the legal policy wins. That is the owners' call, and a recommendation would decide it in practice.
-- "What should happen after 180 days, and who approves large refunds?" Two decisions with different owners, so one gets answered and the other gets lost.
-- A worked example that computes every refund under one reading of "a partial month counts as a month". The question was never asked, and the example answered it.
+- "Should `E_SLOT_LOCKED` fall back to the waiting list?" Only an engineer can read it, and it decides the fallback in the course of asking.
+- "Who answers: Front desk / Membership." The policies name people. A question addressed to no one in particular waits for everyone and is answered by no one.
+- A recommendation on whether the membership policy or the safety policy wins. That is the owners' call, and a recommendation would decide it in practice.
+- "What happens when the partner club's system is down, and who approves group bookings?" Two decisions with different owners, so one gets answered and the other gets lost.
+- A worked example that computes every fee under one reading of "a partial hour counts as an hour". The question was never asked, and the example answered it.
 
 ## Example
 

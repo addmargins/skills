@@ -16,7 +16,7 @@ Hold the spec to one test. Would someone working only from this spec have to dec
 - **Settle nothing that isn't settled.** A statement becomes a rule, a step, or a case result only when a source settles it. The sources are the intent, a policy clause whose words allow one reading, an answer recorded from the person who owns the question, or a derivation (step 4). Anything you inferred is a recommendation, however obvious it seems, and a recommendation lives only inside an open question. Readers treat everything outside the open questions as decided. So a default you pick reaches the code, and its owner never learns it was theirs to decide.
 - **Facts are yours to find.** How the system behaves today, what a policy says, how many steps a flow takes, and what data exists are facts. Read the workspace for them instead of asking anyone. Separate what you verified from what a document or a code comment claims. A fact you could read only in a comment stays marked as claimed, however confident you are, and names who will confirm it.
 - **Decisions belong to their owners.** The product owner decides product behavior and scope, and the originator says whether the spec solves their problem. Each policy owner decides what their policy requires, including how its words are read. A conflict between two policies belongs to both owners, and the product owner routes it. To tell a decision from a technical choice, ask whether a customer, a staff member, a policy owner, or the originator would notice which option was chosen. If they would and no source settles it, it is an open question.
-- **What, not how.** The spec states observable behavior, the rules it must follow, and how reviewers will check it. Module structure, schemas, API shapes, file changes, and test layout belong to the implementation plan. Engineers write that plan after the spec is accepted. A limit of an existing system that changes what people experience is a constraint, so state it in plain words. A payment service that refunds only within 180 days is one. List the choices you leave to engineers on purpose, so reviewers don't mistake them for gaps. Screen copy and layout are not engineering choices: customers see them, and policies may regulate them.
+- **What, not how.** The spec states observable behavior, the rules it must follow, and how reviewers will check it. Module structure, schemas, API shapes, file changes, and test layout belong to the implementation plan. Engineers write that plan after the spec is accepted. A limit of an existing system that changes what people experience is a constraint, so state it in plain words. A partner club's booking system that accepts changes only up to 24 hours ahead is one. List the choices you leave to engineers on purpose, so reviewers don't mistake them for gaps. Screen copy and layout are not engineering choices: customers see them, and policies may regulate them.
 - **Write for the least technical reviewer.** A policy owner must be able to judge each rule and answer each question without reading code. Say each thing once, in the section the template gives it. Elsewhere, refer to it by ID and short name.
 
 ## Workflow
@@ -50,7 +50,7 @@ Walk the main path as the person who uses it: what they see, what they do, what 
 
 Most gaps hide in the same places. Check each one:
 
-- **Who qualifies.** Check also whether the system can tell those people apart, such as a customer who signed up elsewhere, a trial, or a business contract.
+- **Who qualifies.** Check also whether the system can tell those people apart, such as a guest, a member of a partner club, or a staff account.
 - **Boundaries.** Whether a limit is inclusive, how a number rounds, whether counting starts at day 0 or day 1, month ends, and time zones.
 - **What came before.** Renewals, earlier periods, earlier partial actions, and prices that changed since purchase.
 - **Timing and state.** When the change takes effect, what state things are in meanwhile, and whether the person can undo it.
@@ -65,7 +65,7 @@ A policy clause's words may allow two readings that change an outcome. When they
 
 Carry every open question in the intent forward. When a source seems to answer one, quote it, and still ask the person the intent named to confirm. Confirming then takes a yes or a no. Keep every option the intent itself names, even one you think conflicts with something, and state its consequence instead.
 
-It fails like this: the spec restates each refund-policy clause as a rule, but never asks what happens to a customer who cancels on day 200. By then the payment service no longer accepts partial refunds. Every rule has a source, and the builder still decides the day-200 behavior alone.
+It fails like this: the spec restates each booking-policy clause as a rule, but never asks what happens to a member who cancels a partner-club court two hours before the slot. By then the partner club's system no longer accepts changes. Every rule has a source, and the builder still decides the two-hour behavior alone.
 
 ### 4. Sort each undecided point
 
@@ -75,13 +75,13 @@ It fails like this: the spec restates each refund-policy clause as a rule, but n
 
 Before you write a question, check that its answer would change something a reviewer would accept or reject. Leave it out in these cases:
 
-- **Every option already meets the rules and checks the reviewers set, and nobody outside engineering has a reason to prefer one.** List the choice under Left to engineering, together with the check that bounds it. An example is "any file type, as long as the file opens in the accountants' Excel without changes (case 3)".
+- **Every option already meets the rules and checks the reviewers set, and nobody outside engineering has a reason to prefer one.** List the choice under Left to engineering, together with the check that bounds it. An example is "any image format for the stored receipt photo, as long as finance can open it at full size (case 3)".
 - **The plain words of the intent or a policy already answer it.** State the answer as a rule with its source instead. This doesn't apply to questions carried over from the intent, which step 3 keeps open until their named person confirms them.
 - **It concerns something this change doesn't build or touch.** If it matters, give it one line under Scope, at the edges.
 
 Reviewers answer a short list of real questions. Padding hides the questions that matter among ones that don't.
 
-A rule nobody stated may appear only as a derivation. It must follow from its sources with no other reasonable reading, and no open question could change it. Write the reasoning in its source, as in "derived from FIN-REF-03 §2 and §3: one cancellation has one refund amount". If you have to argue for it, it is a recommendation. A gap that puts money, personal data, or a legal obligation at risk becomes a question that blocks planning, never a rule you add.
+A rule nobody stated may appear only as a derivation. It must follow from its sources with no other reasonable reading, and no open question could change it. Write the reasoning in its source, as in "derived from R2 (one booking per court per hour): a second booking for the same court and hour is refused". If you have to argue for it, it is a recommendation. A gap that puts money, personal data, or a legal obligation at risk becomes a question that blocks planning, never a rule you add.
 
 ### 5. Write the spec
 
@@ -100,14 +100,14 @@ Use the headings of [references/spec-template.md](references/spec-template.md) i
 
 Write for a reader who knows the business and not the code:
 
-- Name who does what: the customer, the CS agent, the finance team, the service.
+- Name who does what: the member, the front desk, the finance team, the service.
 - Use one word for each thing. When a policy defines a word, use its definition. Define a word a non-engineer might not know where it first appears, and list it under Terms.
 - Keep numbers, thresholds, dates, conditions, and "must not" statements exactly as the source gives them. Write dates as YYYY-MM-DD.
 - Keep code names, error codes, and file paths out of every section except Facts and sources.
-- Each section mentions a rule or question the first time with its ID and short name, as in "Q3 (retention offer screen)". A row of bare IDs means nothing to a reviewer.
+- Each section mentions a rule or question the first time with its ID and short name, as in "Q3 (late cancellations)". A row of bare IDs means nothing to a reviewer.
 - Don't use this skill's own words, such as "workspace" or "fresh reader", in the spec. Say what they mean in the reader's words.
 
-It fails like this: "R7. `issueRefund()` calls the approval API when `amount > 100000`." A policy owner can't check it, and it decides how to build the approval. Write instead: "R7. **Large refunds:** The service pays a refund over 100,000 won only after the finance team approves it. (FIN-REF-03 §5)"
+It fails like this: "R7. `cancelBooking()` calls `refundFee()` when `hoursBefore >= 24`." A policy owner can't check it, and it decides how to build the refund. Write instead: "R7. **Free cancellation:** A member who cancels 24 hours or more before the slot gets the booking fee back. (BOOK-02 §4)"
 
 ### 6. Check it
 
