@@ -13,7 +13,7 @@ Write a question wherever someone working only from the spec would have to decid
 - a threshold whose relevance depends on a real figure the workspace lacks;
 - a reader's finding that the sources don't settle.
 
-Don't write one when the workspace already answers it. State the answer as a rule or a fact, with its source, so a reader can still correct it. Don't write one for a choice nobody outside engineering would notice; list it under Left to engineering.
+Don't write one when the workspace already answers it. State the answer as a rule or a fact, with its source, so a reader can still correct it. Don't write one for a choice nobody outside engineering would notice; list it under Left to engineering. That includes a choice where every option meets the rules and checks the reviewers set: list it with the check that bounds it. Don't write one about something this change doesn't build or touch, such as what staff do with a file after they download it. If it matters, give it a line under Scope, at the edges.
 
 Ask one thing per question. Two decisions with different owners or different consequences are two questions, even when they concern the same screen.
 
