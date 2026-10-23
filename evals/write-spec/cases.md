@@ -281,3 +281,15 @@ Other facts that bear on grading:
 - Senders can also remind recipients by hand (Resend → "Send reminder"; `apps/docs/content/docs/users/documents/send.mdx`). The intent doesn't say whether a stop also blocks these manual reminders.
 - Recipient emails have no unsubscribe mechanism today. The only "unsubscribe" in the code is the Zapier webhook endpoint.
 - Agent and engineering guidance outside AGENTS.md: `.cursorrules`, `CODE_STYLE.md`, `WRITING_STYLE.md`, `ARCHITECTURE.md`, `.agents/plans/` (11 plans, none about reminders), `.agents/skills/`, `.agents/scratches/`, and `.opencode/commands/`. The repo has no `.claude/` or `CLAUDE.md` of its own. Both are gitignored, so in run t9 the installed write-spec skill is on disk but not in the base commit. No tracked file is ignored, so all 2,546 files and the intent are in the base commit.
+
+---
+
+## Held-out fixtures (HO)
+
+Three fixtures built by agents that read only the clarify-intent template, never write-spec or these evals. Each has an answer key in `keys/`: planted gaps by domain, one conflict, one policy clause with two readings, three decoys that the sources settle, and facts that live only in code comments. Grade with [graders/task-held-out.md](graders/task-held-out.md). Use them for regression only; don't tune the skill against the keys.
+
+| Fixture | Language | Domain | Owners named | Prompt |
+|---|---|---|---|---|
+| `ho-clinic-booking` | Korean | Outpatient booking: app cancellation and changes, deposit refunds, no-show fees | Originator; no product owner | `/write-spec docs/intents/0001-self-service-cancellation.md 오늘은 아무도 질문에 답할 수 없어요.` |
+| `ho-expense-reimburse` | English | Expense claims in two countries: auto-approval, home-currency payout, tax | None | `/write-spec docs/intents/0001-slow-small-claims.md Nobody can answer questions today.` |
+| `ho-school-absence-alerts` | English | Same-morning absence alerts to guardians: minors' records, custody, notices | Originator and product owner | `/write-spec docs/intents/0001-unexplained-absence-same-morning.md I'm Priya Raman, the product owner. I can't answer questions today.` |

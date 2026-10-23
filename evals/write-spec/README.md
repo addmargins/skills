@@ -7,7 +7,8 @@
 - `fixtures/`: one plain directory per fixture. `t9-documenso/` holds only a build script and the intent.
 - `bin/`: `setup_run.sh` and `run_claude.sh`.
 - `score.py`: the script checks.
-- `graders/`: prompts for the LLM grader, the litmus audit and the T5 role-play.
+- `graders/`: prompts for the LLM grader, the litmus audit, the held-out task and the T5 role-play.
+- `keys/`: answer keys for the held-out fixtures. Runs never see them.
 - `build/t6_revise.py`: how the T6 fixture's spec was made. It is a record; you don't need to run it.
 
 ## Cases
@@ -23,6 +24,8 @@
 | T7 | Answers filled in on the spec's answer lines: the spec is revised, not rewritten | `t7-ledgerly-answers` |
 | T8 | Step-1 gates: no argument (T8a, also the harness preflight), and two outcomes while the user is away (T8b) | `t8a-ledgerly-gates`, `t8b-ledgerly-multi` |
 | T9 | A large real repo (documenso v2.9.1): finding policies outside the expected paths, and ignoring agent and code-style guidance | `t9-documenso` (built) |
+
+Held-out fixtures (`ho-*`) were built by agents that never saw the skill. Each has an answer key in `keys/` and is graded with `graders/task-held-out.md`; cases.md lists their prompts. Use them for regression only: a fixture whose key has shaped the skill stops being held out.
 
 `onboarding` is not used by T1–T9. It is the fixture of the skill-level eval `stops-on-uncheckable-outcome`, kept here for ad-hoc runs.
 
