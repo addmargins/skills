@@ -7,7 +7,6 @@ Use these headings in this order and replace each note in angle brackets. SKILL.
 
 Intent: [<intent file name>](../intents/<intent file name>)
 Status: Draft · <N> open questions, <M> block planning
-Verified against: <commit short hash the facts were read from, or "workspace as of YYYY-MM-DD">, <YYYY-MM-DD>
 Supersedes: <earlier spec file name, only when a new intent superseded the earlier spec's intent>
 
 ## Summary
@@ -62,7 +61,7 @@ Supersedes: <earlier spec file name, only when a new intent superseded the earli
 | Policy and clause (owner) | What it requires here | Where this spec stands | How it will be checked |
 |---|---|---|---|
 
-Read and not applicable: <Each policy you read that doesn't apply, and why.>
+Read and not applicable: <Each policy document you read that doesn't apply, by ID and title, and why. Never list contributor guides or skills here.>
 
 ## How we will know it worked
 | Desired outcome (intent) | How someone other than the writer checks it | Baseline → target |
@@ -72,7 +71,8 @@ Read and not applicable: <Each policy you read that doesn't apply, and why.>
 - <A choice nobody outside engineering would notice, and the rules or checks that bound it.>
 
 ## Facts and sources
-- <A fact in plain words.> `<file path>` (<verified in code | stated in a comment or document, not verified; confirmer>)
+Checked against: <commit short hash, or "files as of YYYY-MM-DD">, <YYYY-MM-DD>
+- <A fact in plain words.> `<full file path from the repository root>` (<verified in code | stated in a comment or document, not verified; confirmer>)
 - Not found: <What you searched for and didn't find, and the question that depends on it.>
 
 ## Terms
@@ -106,3 +106,6 @@ The three parts of an open question are the requester's own words. Keep them exa
 | Desired outcome (intent) / How someone other than the writer checks it / Baseline → target | 원하는 결과 (intent) / 작성자가 아닌 사람이 확인하는 방법 / 기준값 → 목표 |
 | verified in code / stated in a comment or document, not verified | 코드에서 확인함 / 주석이나 문서의 주장, 확인하지 않음 |
 | Not found / derived from / None | 찾지 못함 / 도출 / 없음 |
+| (not yet confirmed; X checks) | (아직 확인되지 않음; X가 확인) |
+| no record of X was found; Y checks | X 기록을 찾지 못함; Y가 확인 |
+| Checked against | 확인 기준 |

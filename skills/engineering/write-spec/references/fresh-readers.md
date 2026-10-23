@@ -2,7 +2,29 @@
 
 Give each prompt below to its own subagent, with the paths filled in. Give each one only the files its prompt names: not this conversation, not your notes, and nothing else from the workspace. Run them at the same time. Each returns a list and edits nothing.
 
-Fill in names and roles from the spec's Reviewers table. For the policy reader, pass the full text of every policy document you read, including those you found not applicable.
+Fill in names and roles from the spec's Reviewers table. When the intent names no originator, the originator reader plays "the author of this intent". For the policy reader, pass the full text of every policy document you read, including those you found not applicable.
+
+## Rounds
+
+- A first draft's first round runs all three readers. Skip the policy reader only when you found no policy, privacy, security, compliance, or legal document at all, and say so.
+- Wait for every reader in a round to return before you judge any finding.
+- After you apply findings, check the edited file again (SKILL.md step 6, checks 1–4), then run the next round: the implementer, plus each reader whose part changed. Stop after a round that yields nothing you apply, or after three rounds.
+- On a revision that changes rules or cases, run at least one round: the implementer, plus the policy reader when a policy owner answered, and the originator when scope or an outcome changed.
+
+## Judging findings
+
+- If a source settles it, write or fix the rule, with the source.
+- If no source settles it, add an open question, but only if it passes the check in SKILL.md step 4. Readers raise padding too.
+- If nobody outside engineering would notice, list it under Left to engineering.
+- If the spec already settles it, dismiss it. If the reader missed it because it was hard to find, move or rewrite it.
+
+Never resolve a finding by choosing behavior, or with a hedge such as "not yet confirmed" or "if this turns out to be X, ask Y". Each finding ends as a sourced rule, a question, a fact with a named confirmer, or a dismissal with its reason.
+
+- A finding that needs a decision with a different owner or different consequences from an existing question becomes its own question. Widen an existing question only when the same owner decides it among the same options.
+- When a finding becomes a question, change every other sentence that already settles the point so it names the question instead.
+- A case row you add gets a result only when the rules it cites compute it.
+- When the policy reader says a row settles how a policy's words are read, mark the row as depending on that reading, or quote the words that allow only one reading.
+- When the originator reader reports something dropped or narrowed, restore the intent's wording or ask the originator.
 
 ## Implementer
 
