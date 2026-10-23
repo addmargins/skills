@@ -9,6 +9,7 @@
 - `score.py`: the script checks.
 - `graders/`: prompts for the LLM grader, the litmus audit, the held-out task and the T5 role-play.
 - `keys/`: answer keys for the held-out fixtures. Runs never see them.
+- `pilot/`: a kit (in Korean) for a real team to try the skill on its own intents and measure what role-play can't: reviewer forms, an engineer log of points decided alone, and a facilitator checklist.
 - `build/t6_revise.py`: how the T6 fixture's spec was made. It is a record; you don't need to run it.
 
 ## Cases
