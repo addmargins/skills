@@ -16,8 +16,6 @@ Ask one thing per question. Two decisions with different owners or different con
 
 ## Fields
 
-Write the field labels in the spec's language. In a Korean spec, use the requester's own wording for the three parts: 무엇이 불명확한가? / 그 답에 따라 무엇이 달라지는가? / 무엇을 확인하거나 결정하면 해결되는가?
-
 - **Short name.** The heading: `Q<n>. <a few words naming the decision>`.
 - **What is unclear.** Name the specific gap, and quote or cite the words that leave it open. Say in plain words what any rule it cites requires, so the question reads without the rest of the spec. Say "carried from the intent" when it is. "The policy is unclear" is not a gap. "BOOK-02 §2 takes booking rights from members who 'don't show up', and doesn't say whether arriving 15 minutes late counts" is.
 - **What changes depending on the answer.** Be concrete: who is affected, what they see or receive, which amounts change, which rules and cases change, and what else the answer forces. This field is what lets a non-engineer judge how much the question matters.
@@ -32,7 +30,7 @@ Write the field labels in the spec's language. In a Korean spec, use the request
 Put each question under one class heading.
 
 - **Blocks planning.** The answer changes what gets built: the steps of a flow, who can use it, how amounts are calculated, what data is kept, or what a policy requires. Every conflict between policies goes here, and so does every consent a rule needs. Planning would otherwise have to guess.
-- **Needed before release.** The answer changes a value, a label, what a notice says, or another detail that planning can leave as a slot. Customers must not see the change until it is answered.
+- **Needed before release.** The answer changes a value, a label, what a notice says, or another detail that planning can leave as a slot. A question carried from the intent whose answer changes nothing built also goes here. Customers must not see the change until it is answered.
 
 When you can't tell which applies, choose Blocks planning. Holding up planning costs a day; a guess built into the product costs a release. The spec can be accepted, and planning can start, only when nothing under Blocks planning is open.
 

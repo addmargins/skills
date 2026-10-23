@@ -1,6 +1,6 @@
 # Spec template
 
-Use these headings in this order and replace each note in angle brackets. SKILL.md step 5 says what goes in each section. Keep the headings and header lines in English. Write field labels and table headers in the intent's language; a Korean spec uses the labels at the end.
+Use these headings in this order and replace each note in angle brackets. SKILL.md step 5 says what goes in each section and which parts are written in the intent's language.
 
 ```markdown
 # Spec: <What will be true once this is built, named after the outcome, not a means>
@@ -77,6 +77,10 @@ Read and not applicable: <Each policy you read that doesn't apply, and why.>
 
 ## Terms
 - **<Term>:** <What it is, in plain words, and the policy that defines it, if one does.>
+
+## Decision log
+<Add this section at the first answer; see revising.md.>
+- Q<n> (<short name>): <the answer>. <Who decided>, <YYYY-MM-DD>, <where it was given>.
 ```
 
 ## Korean labels
