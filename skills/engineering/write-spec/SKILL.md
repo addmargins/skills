@@ -61,7 +61,7 @@ Most gaps hide in the same places. Check each one:
 
 Then look for conflicts: between two policies, between a policy and the intent, and between the intent or a policy and a fact about the existing system. For each one, check whether some behavior satisfies both sides. If one does, state the constraint and show that it can be met. If none does, or if meeting both depends on how an owner reads their policy, write an open question for the owners on both sides, routed by the product owner. Show the count, the arithmetic, or the screen-by-screen walk that proves the conflict. Don't choose which side wins, and don't soften either side to make them fit.
 
-A policy clause's words may allow two readings that change an outcome. When they do, state as a rule only what both readings share, and ask the policy owner about the difference. A worked example computed under one reading settles the question just as a rule would.
+A policy clause's words may allow two readings that change an outcome. When they do, state as a rule only what both readings share, and ask the policy owner about the difference. Picking the stricter reading is still picking one. A worked example computed under one reading settles the question just as a rule would.
 
 Carry every open question in the intent forward. When a source seems to answer one, quote it, and still ask the person the intent named to confirm. Confirming then takes a yes or a no. Keep every option the intent itself names, even one you think conflicts with something, and state its consequence instead.
 
@@ -77,7 +77,7 @@ Before you write a question, check that its answer would change something a revi
 
 - **Every option already meets the rules and checks the reviewers set, and nobody outside engineering has a reason to prefer one.** List the choice under Left to engineering, together with the check that bounds it. An example is "any image format for the stored receipt photo, as long as finance can open it at full size (case 3)".
 - **The plain words of the intent or a policy already answer it**, with no other reasonable reading of the words or of the things they apply to. State the answer as a rule with its source instead. An answer that rests on a term the workspace doesn't define, such as what a "no-show" means, still needs the question. This doesn't apply to questions carried over from the intent, which step 3 keeps open until their named person confirms them.
-- **Its answer doesn't change what this spec builds.** That covers something this change doesn't build or touch, an obligation on people outside the scope, and a success target. Give it one line where it belongs, naming who should settle it: under Scope, at the edges, or in How we will know it worked. Two kinds stay questions, under Needed before release, even when this change doesn't build them: a question carried over from the intent, and a point that could defeat the intent or put money, personal data, or a legal obligation at risk.
+- **Its answer doesn't change what this spec builds.** That covers something this change doesn't build or touch, an obligation on people outside the scope, and a success target. Give it one line where it belongs, naming who should settle it: under Scope, at the edges, or in How we will know it worked. Two kinds stay questions, under Needed before release: a question carried over from the intent, and a line that would ask a named person to decide something that could defeat the intent or put money, personal data, or a legal obligation at risk.
 - **It arises only if an unconfirmed fact turns out a certain way, and no source suggests it does.** State the fact as not yet confirmed, with its confirmer.
 
 Reviewers answer a short list of real questions. Padding hides the questions that matter among ones that don't.
@@ -98,7 +98,7 @@ Use the headings of [references/spec-template.md](references/spec-template.md) i
 - **Policies.** Give each applicable clause one row: what it requires here, where the spec stands (the rules that meet it, or the question it raises), and how it will be checked. The check is the cases that test it, or a named owner's review before release. A clause with neither is a gap: add a case, a review, or a question. When no policy applies, write the section as one line.
 - **Reviewers.** Give each person one row: the originator and product owner from the intent, the owner each applicable policy names, the technical lead, and the engineers. Name people only as a source names them. List each person's questions, and every other line in the spec that asks them to decide, confirm, or review something, by section. Each claimed fact that a rule or question rests on needs a confirmer: the technical lead, or "the product owner assigns one" when no technical lead is named. This table is the only index of the questions, so keep it in step with them.
 - **How we will know it worked.** Map each desired outcome in the intent to a check that someone other than you can perform, with its baseline and target. Say who sets a target that is still open.
-- **Facts and sources.** Start with the commit or date you read. Keep one list of every workspace fact the spec relies on. Give each its full path from the repository root and whether you verified it or read it in a comment or document. The technical lead confirms this list. Elsewhere, state a fact in plain words, and only where it drives a rule or question.
+- **Facts and sources.** Start with the commit or date you read. Keep one list of every workspace fact the spec relies on, one fact per line. Give each its full path from the repository root and whether you verified it in code or only read it in a comment or document. The technical lead confirms this list. Elsewhere, state a fact in plain words, and only where it drives a rule or question.
 - **Terms.** List only words a policy defines and words with tempting synonyms. Define what a thing is, not what it does. Never define a word a policy uses without defining it; if its meaning changes an outcome, ask the policy owner.
 
 Write for a reader who knows the business and not the code:
@@ -131,11 +131,11 @@ Save the draft at the path in step 7, then check it in this order.
 
 Save the spec beside the intent: for `<dir>/docs/intents/NNNN-<slug>.md`, write `<dir>/docs/specs/NNNN-<slug>.md`. Create `docs/specs/` if it doesn't exist. The shared file name pairs the two, so neither needs a link added. Don't modify the intent, the policies, or earlier specs, except for the `Superseded by:` line that the superseding rule adds to a replaced spec.
 
-Set the status to Draft. Then tell the user, in a few lines:
+Set the status to Draft. Then tell the user:
 
 - The file path, the number of open questions, and how many block planning.
 - The questions that block planning, grouped by who answers them, each by ID and short name.
 - Each conflict between policies, or between a policy and the intent, in one line. The product owner settles these with the policy owners before engineers plan.
-- What the fresh readers changed, and every finding you didn't apply, from any round, each in one line with the reason. Report a finding as applied only if the file now settles it or asks it.
+- What the fresh readers changed, and every finding you didn't apply, from any round, one line each, grouped by reason. Report a finding as applied only if the file now settles it or asks it.
 
 Then offer to go through the open questions the user owns, one per turn, and ask which are theirs if they haven't said. Ask each as a choice question (step 1) built from that question's options. Apply each answer as [references/revising.md](references/revising.md) describes. Don't write the implementation plan.

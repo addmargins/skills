@@ -8,7 +8,7 @@ Fill in names and roles from the spec's Reviewers table. When the intent names n
 
 - A first draft's first round runs all three readers. Skip the policy reader only when you found no policy, privacy, security, compliance, or legal document at all, and say so.
 - Wait for every reader in a round to return before you judge any finding.
-- After you apply findings, check the edited file again (SKILL.md step 6, checks 1–4), then run the next round: a new implementer, plus each reader whose part changed. Stop after a round that yields nothing you apply, or after three rounds.
+- After you apply findings, check the edited file again (SKILL.md step 6, checks 1–4), then run the next round: a new implementer, plus each reader whose part changed. The originator's part is the Summary, Scope, How we will know it worked, and questions addressed to the originator or product owner. The policy reader's part is the Rules, Cases, Policies, and questions addressed to a policy owner. Stop after a round that yields nothing you apply, or after three rounds.
 - On a revision that changes rules or cases, run at least one round: the implementer, plus the policy reader when a policy owner answered, and the originator when scope or an outcome changed.
 
 ## Judging findings

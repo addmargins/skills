@@ -19,7 +19,7 @@ Supersedes: <earlier spec file name, only when a new intent superseded the earli
 - At the edges: <People or channels outside the scope that a policy or a fact still reaches, and who should settle each.>
 
 ## Reviewers
-| Role | Who | What to check | Questions to answer or confirm |
+| Role | Who | What to check | Questions and other asks |
 |---|---|---|---|
 | Originator | <from the intent> | Does this spec solve the problem the intent describes? Was anything dropped or narrowed? | |
 | Product owner | <from the intent or workspace> | Scope and product behavior; routes each policy conflict to its owners | |
@@ -90,7 +90,7 @@ The three parts of an open question are the requester's own words. Keep them exa
 | English | Korean |
 |---|---|
 | In / Out / Unchanged / At the edges | 포함 / 제외 / 그대로 유지 / 범위 경계 |
-| Role / Who / What to check / Questions to answer or confirm | 역할 / 누구 / 확인할 것 / 답하거나 확인할 질문 |
+| Role / Who / What to check / Questions and other asks | 역할 / 누구 / 확인할 것 / 질문과 그 밖의 요청 |
 | Originator / Product owner / Policy owner / Technical lead / Engineers | 원 작성자 / 제품 책임자 / 정책 소유자 / 기술 리드 / 엔지니어 |
 | What is unclear | 무엇이 불명확한가? |
 | What changes depending on the answer | 그 답에 따라 무엇이 달라지는가? |

@@ -29,10 +29,10 @@ Ask one thing per question. Two decisions with different owners or different con
 
 Put each question under one class heading.
 
-- **Blocks planning.** The answer changes what gets built: the steps of a flow, who can use it, how amounts are calculated, what data is kept, or what a policy requires. Every conflict between policies goes here, and so does every consent a rule needs. Planning would otherwise have to guess.
+- **Blocks planning.** The answer changes what gets built: the steps of a flow, who can use it, how amounts are calculated, what data is kept, or what a policy requires of it. Every conflict between policies goes here, and so does every consent a rule needs. Planning would otherwise have to guess.
 - **Needed before release.** The answer changes a value, a label, what a notice says, or another detail that planning can leave as a slot. A question carried from the intent whose answer changes nothing built also goes here. Customers must not see the change until it is answered.
 
-To tell them apart, ask whether planning could build the flow with the answer as a slot to fill in, such as a value, a wording, a label, or "nothing". If so, the question is Needed before release. So is a request for a real figure that only replaces example values. How rarely a situation occurs never sets the class. When you still can't tell whether an answer changes a flow, who qualifies, an amount, the data kept, or what a policy requires, choose Blocks planning. Holding up planning costs a day; a guess built into the product costs a release. The spec can be accepted, and planning can start, only when nothing under Blocks planning is open.
+To tell them apart, ask whether planning could build the flow with the answer as a slot to fill in, such as a value, a wording, a label, or "nothing". If so, the question is Needed before release. So is a request for a real figure that only replaces example values, and a choice of what a line says, including printing nothing, even when an owner must confirm it still meets the outcome. How rarely a situation occurs never sets the class. When you still can't tell whether an answer changes a flow, who qualifies, an amount, the data kept, or what a policy requires, choose Blocks planning. Holding up planning costs a day; a guess built into the product costs a release. The spec can be accepted, and planning can start, only when nothing under Blocks planning is open.
 
 ## How questions fail
 
