@@ -38,7 +38,7 @@ Put each question under one class heading.
 
 - **Blocks planning.** The answer changes what gets built: the steps of a flow, who can use it, how amounts are calculated, what data is kept, or what a policy requires. Every conflict between policies is here. Planning would otherwise have to guess.
 - **Needed before release.** The answer changes a value, a label, what a notice says, or another detail that planning can leave as a slot. Customers must not see the change until it is answered.
-- **Doesn't block.** The answer doesn't change what gets built now, such as a success target, or a concern outside the scope that the product owner should know about.
+- **Doesn't block.** Someone still has to decide it, but the answer doesn't change what this spec builds. Examples are a success target, or an obligation a policy places on people outside the scope. A plain observation about something outside the scope is not a question. Give it a line under Scope, at the edges.
 
 When you can't tell which applies, choose Blocks planning. Holding up planning costs a day; a guess built into the product costs a release. The spec can be accepted, and planning can start, only when nothing under Blocks planning is open.
 

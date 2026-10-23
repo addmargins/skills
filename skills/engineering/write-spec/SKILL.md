@@ -76,12 +76,12 @@ It fails like this: the spec restates each booking-policy clause as a rule, but 
 Before you write a question, check that its answer would change something a reviewer would accept or reject. Leave it out in these cases:
 
 - **Every option already meets the rules and checks the reviewers set, and nobody outside engineering has a reason to prefer one.** List the choice under Left to engineering, together with the check that bounds it. An example is "any image format for the stored receipt photo, as long as finance can open it at full size (case 3)".
-- **The plain words of the intent or a policy already answer it.** State the answer as a rule with its source instead. This doesn't apply to questions carried over from the intent, which step 3 keeps open until their named person confirms them.
+- **The plain words of the intent or a policy already answer it**, with no other reasonable reading of the words or of the things they apply to. State the answer as a rule with its source instead. An answer that rests on a term the workspace doesn't define, such as what a "void" status means, still needs the question. This doesn't apply to questions carried over from the intent, which step 3 keeps open until their named person confirms them.
 - **It concerns something this change doesn't build or touch.** If it matters, give it one line under Scope, at the edges.
 
 Reviewers answer a short list of real questions. Padding hides the questions that matter among ones that don't.
 
-A rule nobody stated may appear only as a derivation. It must follow from its sources with no other reasonable reading, and no open question could change it. Write the reasoning in its source, as in "derived from R2 (one booking per court per hour): a second booking for the same court and hour is refused". If you have to argue for it, it is a recommendation. A gap that puts money, personal data, or a legal obligation at risk becomes a question that blocks planning, never a rule you add.
+A rule nobody stated may appear only as a derivation. It must follow from its sources with no other reasonable reading, and no open question could change it. Write the reasoning in its source, as in "derived from R2 (one booking per court per hour): a second booking for the same court and hour is refused". If you have to argue for it, it is a recommendation. A derivation can show that something is needed, but it can't approve it. When meeting a rule needs someone's consent, such as granting a permission that a policy controls or an exception to a policy, ask that person as a question that blocks planning. A gap that puts money, personal data, or a legal obligation at risk becomes a question that blocks planning, never a rule you add.
 
 ### 5. Write the spec
 
