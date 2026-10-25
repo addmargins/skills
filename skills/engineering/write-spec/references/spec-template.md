@@ -32,7 +32,7 @@ So that: <the intent outcome or scope item this serves, in the intent's words>.
 - <What a reader might expect this to cover but it does not, and why when a reason was given. For an exclusion the intent does not make: (decided in conversation) or (decided by <name>, <role>, <where>).>
 
 ## From the intent
-- Outcome "<desired outcome, quoted>": <R<n> (Short name), …>.
+- Outcome "<desired outcome, quoted>": <R<n> (Short name), …>. <For each vague word in it: "<word>" means <value>, with its marker.>
 - Question "<intent open question, quoted>": <answered by R<n> (Short name) | carried as Q<n> | no longer applies: <reason>, agreed by <intent originator>, <where>>.
 
 ## Open questions
