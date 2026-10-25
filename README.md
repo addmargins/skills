@@ -36,6 +36,7 @@ Restart Claude Code to apply an update.
 | Skill | What it does |
 |---|---|
 | `/clarify-intent <idea>` (or `/addmargins:clarify-intent` if another command takes the short name) | Turns a rough idea into a short intent document (problem, desired outcome, affected users and systems, scope and constraints, open questions) before any specification or implementation work. |
+| `/write-spec <intent file>` (or `/addmargins:write-spec`) | Turns an accepted intent document into a spec (requirements with scenarios, policy and design constraints, open questions for whoever decides each) that stakeholders who are not engineers can review. |
 
 ## Repository structure
 
