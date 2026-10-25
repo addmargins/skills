@@ -72,7 +72,9 @@ Ids are stable. Never renumber: a removed item leaves a gap. Cite an item by id 
 
 ### 5. Check the form
 
-Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>`. It needs a POSIX shell and awk. It finds the intent from the `Intent:` line and an earlier spec from the `Supersedes:` line. Fix every line it prints and run it again until it prints nothing. If you can't run it, check the same things by hand: every heading, field, and reference it would check, and every vague word, such as "appropriately", "as needed", or "etc.", replaced by the value, state, or next action it stands for.
+Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>`. It needs a POSIX shell and awk, and finds the intent and any earlier spec from the `Intent:` and `Supersedes:` lines. It checks what a reader of spec.md alone cannot see: every R, C, and Q id mentioned is defined once and cited by its current name; From the intent quotes each intent outcome and open question; Open questions starts with the template's note word for word; Changes to existing behavior and Open questions are present and say "None." exactly when they list nothing; `(decided in conversation)` has its `Decided in conversation:` line; and a revision keeps each inherited name on its old id. Fix each line it prints and run it again until it prints nothing. If a line is wrong about the spec, don't change correct text to silence it; tell the user. If you can't run it, check those six things by hand.
+
+Then check by hand that each requirement has a `So that:` line and a scenario, each constraint has `Source:`, `Owner:`, and `Reason:`, and each open question has its three lines.
 
 ### 6. Check with a fresh reader
 
