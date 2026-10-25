@@ -39,4 +39,4 @@ Until a question below is answered, plan and build the items named under its "De
 - Q1. <What is unclear.>
   - Depends on the answer: <which R or C items change, and how, for each likely answer.>
   - To resolve: <the decision to make and who makes it, or the fact to check and why it could not be checked while writing.>
-  - Until decided: <"do not build R<n> (Short name)"; "do not build R<n> (Short name) for <the case that waits>; meanwhile <what that case does, with its marker>"; or "build R<n> (Short name) with <what to build meanwhile>, accepted by <decider>, <where>".>
+  - Until decided: <"do not build R<n> (Short name)"; "do not build R<n> (Short name) for <the case that waits>; meanwhile <what that case does, with its marker>"; "build R<n> (Short name) <except for the case that waits>, but do not switch it on"; or "build R<n> (Short name) with <what to build meanwhile>, accepted by <decider>, <where>".>
