@@ -22,13 +22,13 @@ Status: <number> open questions.
 <"Must" sentences: what the actor or another system observes.>
 
 - Given <situation, with actual values>, when <action>, then <what is seen or returned, with actual values>.
-- <Another case only when its result does not follow from the rule above.>
+- <Another case only when its result does not follow from the rule above, or to show a threshold the rule names (a date, time, age, count, or amount): one case at the exact value, with the result on each side.>
 
 ## Changes to existing behavior
-- Today: <what happens now> (current behavior, <source>). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, data, or integrations>. Can be undone: <yes, or what cannot be reversed>.
+- Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, data, or integrations>. Can be undone: <yes, or what cannot be reversed>.
 
 ## Constraints
-- C1. <Short name>: <the rule in one checkable sentence, citing rather than restating its source>. Kind: <policy, or design (a system, contract, or the intent's own limit)>. Source: <document and section, or person; for design, "verified in <code>" or "claimed in <document>, not verified">. Owner: <who interprets or waives it, or "not named">. Reason: <as the source states it, or "not stated"; never supply one>.
+- C1. <Short name>: <the rule in one checkable sentence, citing rather than restating its source>. Kind: <policy, or design (a system, contract, or the intent's own limit)>. Source: <document title and section, or person; for design, "verified in S<n> (Plain name)" or "claimed in S<n> (Plain name), not verified">. Owner: <who interprets or waives it, or "not named">. Reason: <only as the source states one; omit the field when it states none>.
 
 ## Conflicts
 - <Any two R or C items, by id and name: the case, with actual values, where both cannot hold.> <Agreed by <the owner of each rule that gives way>, <where>, <date>: <which wins, or the exception> | Unresolved: see Q<n>.>
@@ -38,17 +38,21 @@ Status: <number> open questions.
 
 ## From the intent
 - Outcome "<desired outcome, quoted>": <R<n> (Short name), …>. <Each vague word in it: "<word>" means <value>, with its marker.>
-- Question "<intent open question, quoted>": <answered by R<n> (Short name) | answered by Out of scope (<marker>) | carried as Q<n> | no longer applies: <reason>, agreed by <intent originator>, <where>>.
+- Question "<intent open question, quoted>": <answered by R<n> (Short name) | answered by Out of scope (<marker>) | carried as Q<n> | open, but every answer builds the same: <why> | no longer applies: <reason>, agreed by <intent originator>, <where>>.
 
 ## Open questions
-Until a question is answered, build what its "Depends on the answer" names only as its "Until decided" says, and list it in the plan as waiting. The person under "Who answers" replies on this spec's pull request; anyone may settle a question of fact by checking it and saying what they found where. To close a question, write the answer into every line that names it, add it to the Decision log, update Status, and remove it; its id is not reused. Everything else in this spec is decided. If you find a behavior that a user, a stakeholder, or another system would notice and this spec does not settle, add a question here instead of choosing; how to build it is the plan's choice.
+Everything outside these questions is decided. Until one is answered, build what it holds back only as its "Until decided" says, and plan it as waiting; without that line, its case stays off and actors see today's behavior. The person under "Who answers" decides on the pull request; anyone may settle a fact by checking. Unsettled behavior becomes a question, not a choice; how to build is the plan's.
 
 - Q1. <Short name>
-  - What is unclear: <one sentence.>
+  - What is unclear: <one sentence, naming the case that waits.>
   - Depends on the answer: <for each likely answer, which R or C items change and how.>
   - To resolve: <the decision to make, or the fact to check and why it could not be checked yet.>
   - Who answers: <role and name, as under Reviewers; when more than one, what each decides or confirms.>
-  - Until decided: <"build R<n> (Short name) except <the case that waits>", or, when all of it waits, "do not build R<n> (Short name)" or "build R<n> (Short name) but do not switch it on"; then "meanwhile, <the actor> sees <what this spec already says they see, such as a Changes row's Today>". Or "nothing waits", when every likely answer builds the same thing.>
+  - Until decided: <omit when only the case asked about waits. Otherwise "do not build R<n> (Short name)", "build R<n> (Short name) but do not switch it on", or "build R<n> (Short name) except <what waits>"; then "meanwhile, <the actor> sees <what this spec already says they see, such as a Changes row's Today>".>
 
 ## Decision log
 - Q<n> (<short name>): <the answer>. <Name>, <role>, <pull request comment link, or "conversation">, <date>. <Lines it changed are marked (decided by <name>, <role>, Q<n>).>
+
+## Sources
+<For engineers: each file a marker or constraint cites, under the plain name the prose uses.>
+- S1. <Plain name>: <file path, and the function, field, or lines read>.
