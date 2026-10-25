@@ -41,10 +41,12 @@ note=$(awk '/^## Open questions/ { on = 1; next } on && NF { print; exit }' "$te
 banned='gracefully|appropriately|as needed|as appropriate|if possible|if needed|quickly|intuitive|seamless|user-friendly|robust|etc.|and/or|TBD|적절히|가능하면|필요시|빠르게|원활하게'
 
 sections='Summary|Requirements|Changes to existing behavior|Constraints|Policy conflicts|Out of scope|From the intent|Open questions'
-required='Summary|Requirements|From the intent|Open questions'
+required='Summary|Requirements|Changes to existing behavior|From the intent|Open questions'
+# Sections that say "None." when they list nothing, and only then.
+say_none='Changes to existing behavior|Open questions'
 
 awk -v SPEC="$spec" -v BANNED="$banned" -v NOTE="$note" -v HAS_OLD="$has_old" \
-    -v SECTIONS="$sections" -v REQUIRED="$required" '
+    -v SECTIONS="$sections" -v REQUIRED="$required" -v SAY_NONE="$say_none" '
 function norm(s) { s = tolower(s); sub(/^[ \t]+/, "", s); sub(/[ \t.]+$/, "", s); return s }
 function report(line, msg) { print SPEC ":" line ": " msg; bad = 1 }
 function strip_quotes(s) {                   # quoted words are the source'"'"'s, not the writer'"'"'s
@@ -106,7 +108,7 @@ fence { next }
 
 /^## / {
   close_item()
-  sec = substr($0, 4); seen_sec[sec] = 1; note_due = (sec == "Open questions")
+  sec = substr($0, 4); seen_sec[sec] = 1; sec_line[sec] = FNR; note_due = (sec == "Open questions")
   n = split(SECTIONS, order, "|"); pos = 0
   for (i = 1; i <= n; i++) if (order[i] == sec) pos = i
   if (!pos) report(FNR, "unknown section \"" sec "\"")
@@ -173,6 +175,9 @@ sec == "From the intent" && match($0, /"[^"]*"/) {
   ledger[norm(substr($0, RSTART + 1, RLENGTH - 2))] = 1
 }
 
+sec != "" && /^- / { n_items[sec]++ }
+sec != "" && /^None\.[ \t]*$/ { none_line[sec] = FNR }
+
 sec != "Open questions" && sec != "From the intent" { check_banned($0, FNR) }
 
 {
@@ -194,6 +199,13 @@ END {
   close_item()
   n = split(REQUIRED, req, "|")
   for (i = 1; i <= n; i++) if (!(req[i] in seen_sec)) report(1, "no \"## " req[i] "\" section")
+  n = split(SAY_NONE, empty, "|")
+  for (i = 1; i <= n; i++) {
+    s = empty[i]
+    if (!(s in seen_sec)) continue
+    if (!n_items[s] && !(s in none_line)) report(sec_line[s], "\"" s "\" lists nothing: write \"None.\" under it")
+    if (n_items[s] && (s in none_line)) report(none_line[s], "\"" s "\" says \"None.\" but also lists items")
+  }
 
   for (i = 1; i <= n_ref; i++) {
     rid = refs[i]; k = substr(rid, 1, 1)

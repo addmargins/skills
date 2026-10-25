@@ -17,7 +17,7 @@ The test for a finished spec: someone working only from spec.md never has to dec
 - **Facts are yours to find.** Before asking anyone, read the workspace for how things work today and for the rules that apply: ADRs, policy documents, a `GLOSSARY.md`, the code. Separate what a document claims from what you verified. A question of fact goes under Open questions only when you could not check it, and says why.
 - **What, not how.** The spec states what an actor or another system observes, and the rules the work must follow. Module structure, files, types, and algorithms belong to the plan. Fix an interface or data format only when someone outside this build depends on it, or a stakeholder would notice if it changed: give one plain sentence saying what it is for, then a sample, or a link to the schema that owns it. Write a lifecycle as a table of state, event, next state, and who sees what.
 - **Plain words, one term per concept.** Use the glossary's terms, or the intent's terms when there is no glossary. Define a new term in one clause where it first appears. A term whose meaning stakeholders disagree on is an open question.
-- **Compact.** Say each thing once, in the section the template gives it. Omit any section that would be empty, except Open questions. Don't add sections for status, approvals, revision history, background, risks, assumptions, testing decisions, or further notes. The problem lives in the intent; the Summary carries one clause of it.
+- **Compact.** Say each thing once, in the section the template gives it. Omit any section that would be empty, except Changes to existing behavior and Open questions, which say "None." instead. Don't add sections for status, approvals, revision history, background, risks, assumptions, testing decisions, or further notes. The problem lives in the intent; the Summary carries one clause of it.
 
 ## Workflow
 
@@ -26,6 +26,8 @@ The test for a finished spec: someone working only from spec.md never has to dec
 Take the intent file from the invocation arguments or the user's message. If there is none, list `docs/intents/` and ask which one, in one sentence. If the intent is marked `Superseded by:`, use the one it names. If the intent has no settled problem or desired outcome, stop and suggest running `clarify-intent` first.
 
 List each `docs/specs/` in the workspace and read any spec built on the same intent. If one exists, ask whether this is a revision of it.
+
+When a revision answers an open question that needed a decision, write the answer into each item named under the question's "Depends on the answer", with its `(decided by <name or role>, <where>)` marker. Update the From the intent and Policy conflicts lines that pointed at the question, then remove the question. Its id is not reused. Don't keep an answered question in the spec, or an `Answered:` line under it: its "Until decided" line would still hold the work back, and the answer would live in two places.
 
 Read the parts of the workspace the intent touches: current behavior, the ADRs and policies that apply, and the glossary.
 
@@ -55,7 +57,7 @@ Use the headings of [references/spec-template.md](references/spec-template.md) i
 
 - **Summary**: two or three sentences: one clause of the intent's problem, who this is for, and what they will see. Each claim about what is built must be backed by a requirement.
 - **Requirements**: one behavior someone outside can check per requirement; anything checkable only from inside is plan material or a constraint. The actor goes in the heading. `So that:` quotes the intent outcome or scope item it serves. In scenarios, values and states are always literal. Quote a message's exact wording only when someone decided it or depends on it, such as legal or consent text, a promise about money or deadlines, text a policy owner approves, or text another system parses; otherwise give its meaning. Each "then" names a value, a state, a message's meaning, or what the observer can do next. Add a case only when its result does not follow from the rule above it.
-- **Changes to existing behavior**: one row per behavior in use that changes. When the new behavior needs scenarios, write it as a requirement and point the row at it. When whether it can be undone depends on how the plan does it, record what the stakeholder requires, as a decided value.
+- **Changes to existing behavior**: always present. One row per behavior in use that changes, or "None." when nothing in use changes. When the new behavior needs scenarios, write it as a requirement and point the row at it. When whether it can be undone depends on how the plan does it, record what the stakeholder requires, as a decided value.
 - **Constraints**: list a rule only if this work could break it. Cite ADRs and policies in `Source:` instead of restating them. Give the reason as the source states it, or "not stated"; never supply one. When a reader would need a reason the source doesn't give, ask the constraint's owner in an open question.
 - **Out of scope**: what a reader might expect this to cover but it does not.
 - **From the intent**: one line per intent outcome, quoted, with the requirements that deliver it, and one line per intent open question, quoted, with where it went. Only the intent's originator can retire a question as no longer applying; record who agreed and where.
@@ -72,11 +74,20 @@ Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>`. It needs a 
 
 ### 6. Check with a fresh reader
 
-You can't run the spec's test yourself, because you fill gaps from this conversation without noticing. Give spec.md and nothing else to a fresh subagent, on a different model when one is available, with this request:
+You can't run the spec's test yourself, because you fill gaps from this conversation without noticing. Give spec.md and the intent, and nothing else, to a fresh subagent, on a different model when one is available, with this request:
 
-> List each product behavior or constraint you would have to choose on your own to build this spec, giving the R or C id and two choices a builder could reasonably make. Also list each Summary claim that no requirement backs, and, for each open question, anything not named under its "Depends on the answer" that would change with the answer.
+> You will build from this spec and can't ask anyone. List at most 12 items, most important first, in three groups:
+> 1. Unmarked behavior: each sentence in a requirement or a Changes row that states a value or behavior the intent does not state and that has no "(decided by …)" or "(current behavior, …)" marker. Give the id and quote the sentence.
+> 2. Choices someone outside would notice: each behavior you would have to choose on your own where a user, a stakeholder, or another system would see a different result depending on your choice. Give the R or C id, the situation with literal values, and the two results they would see. Leave out how to build it: data formats, encodings, retries, duplicate deliveries, message length, ordering or timing below what a person would notice, and failures nobody outside sees.
+> 3. Each Summary claim that no requirement backs, and each "Until decided" line that holds back something the spec decides elsewhere, or lets something go ahead that the answer would change.
 
-Drop items that no requirement reaches. Each remaining item is a gap: settle it with the user as in step 3, or add it as an open question naming who decides. Never fill one in yourself. Repeat steps 5 and 6 until the reader lists nothing new, or everything it lists is an open question.
+Sort each item into one of three cases:
+
+- **Settled but not written**: you can cite the conversation turn or the workspace file that settled it. Write it in with its marker. If you can't cite one, it is not settled.
+- **Not a gap**: the result follows from a requirement or constraint as written, and you can cite it; or the situation can't happen given current behavior the spec states; or only the people building it would notice. Drop it.
+- **A gap**: settle it with the user in one round as in step 3, or add an open question naming who decides. Never fill one in yourself.
+
+Then run step 5 and this step once more, giving a new reader only the changed spec and the intent. Stop after that second reader, even if it lists new items. Sort each item it lists as above, and put any gap you can't settle under Open questions. Don't add requirements just to answer the reader.
 
 ### 7. Save the spec
 

@@ -18,6 +18,7 @@ So that: <the intent outcome or scope item this serves, in the intent's words>.
 
 ## Changes to existing behavior
 - Today: <what happens now>. After: <what happens instead, with actual values, or "see R<n> (Short name)">. Affects: <who, or which data or integrations>. Can be undone: <yes, or what cannot be reversed>.
+<Or "None." when nothing in use changes.>
 
 ## Constraints
 - C1. <Short name>: <A rule the work must follow, stated so a reviewer can tell whether it holds.> Source: <ADR, document and section, regulation, system, or person>. Owner: <who interprets or waives it>. Reason: <as the source states it, or "not stated">.
@@ -33,7 +34,7 @@ So that: <the intent outcome or scope item this serves, in the intent's words>.
 - Question "<intent open question, quoted>": <answered by R<n> (Short name) | carried as Q<n> | no longer applies: <reason>, agreed by <intent originator>, <where>>.
 
 ## Open questions
-Until a question below is answered, plan and build the items named under its "Depends on the answer" only as its "Until decided" line says, and list them in the plan as waiting on that question. Anyone may settle a question of fact by checking it and recording what they found and where. Everything else in this spec is decided. If you find something this spec does not settle, add a question here instead of choosing.
+Until a question below is answered, plan and build the items named under its "Depends on the answer" only as its "Until decided" line says, and list them in the plan as waiting on that question. Anyone may settle a question of fact by checking it and recording what they found and where. To close a question that needs a decision, revise this spec: write the answer into each item named under its "Depends on the answer", marked (decided by <name or role>, <where>), update the From the intent and Policy conflicts lines that point at the question, and remove the question. Its id is not reused. Everything else in this spec is decided. If you find a behavior that a user, a stakeholder, or another system would notice and this spec does not settle, add a question here instead of choosing; how to build it is the plan's choice.
 
 - Q1. <What is unclear.>
   - Depends on the answer: <which R or C items change, and how, for each likely answer.>
