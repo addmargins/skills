@@ -1,6 +1,6 @@
 ---
 name: write-spec
-description: Draft a specification (what must be built, and which design and policy constraints it must follow) from an accepted intent document, without interviewing anyone, for stakeholders who are not engineers to review on a pull request. Every undecided behavior becomes an open question for the role that decides it. Also revises a spec under review from its pull request comments, applying only answers from whoever holds each question's role.
+description: Draft a specification (what must be built, and which design and policy constraints it must follow) from an accepted intent document, without interviewing anyone, for stakeholders who are not engineers to review on a pull request. Every undecided behavior becomes an open question for the role that decides it, to answer before merging or carry into the plan. Also revises a spec under review from its pull request comments, applying only answers from whoever holds each question's role.
 argument-hint: <intent file> | <spec file> <review comments or pull request>
 disable-model-invocation: true
 ---
@@ -11,7 +11,7 @@ Turn an accepted intent into a spec of what to build and the design and policy c
 
 The test for a finished spec: someone working only from spec.md never has to decide a product behavior or constraint that nobody has decided. Each such gap is an open question for the role that decides it.
 
-This skill often runs as a job when an intent is accepted, with nobody to ask, and even an invoker is rarely the decider. So a draft asks nobody and settles only what the sources settle; the rest become questions for the roles that decide them, answered on the pull request.
+This skill often runs as a job when an intent is accepted, with nobody to ask, and even an invoker is rarely the decider. So a draft asks nobody and settles only what the sources settle; the rest become questions answered on the pull request.
 
 By default, draft (steps 1 to 7). Given a spec under review and its comments, revise it ("Revise from review"). Take answers in this conversation only when the invoker explicitly asks ("Answers in conversation").
 
@@ -33,46 +33,49 @@ Read each spec in `docs/specs/` built on the same intent. If one is under review
 
 ### 2. Find the gaps
 
-Draft the requirements in your head. For each, list what a builder would otherwise decide alone. These are prompts for noticing cases, not slots to fill:
+Draft the requirements in your head. For each, list what a builder would otherwise decide alone that changes what a user, a stakeholder, or another system observes. These are prompts for noticing cases, not a checklist:
 
 - scope boundaries a reader might expect covered;
 - values, defaults, limits, and thresholds, and the behavior on both sides of each limit;
 - each vague word in an outcome, such as "soon": the value it stands for. Current behavior covering part of it is a fact to give with the question, not the answer;
 - no permission, nothing there yet;
-- the switch-over: things under way when the change goes live, such as an invoice issued before and paid after; and what is sent, held, or lost while something the work relies on is down, including opt-outs and other actions a rule requires;
 - in the main flow, which inputs count as each action, which item an input means when more than one fits, and what each actor sees or receives after it, including nothing;
-- the same person acting again or reversing their action, such as accepting after declining: what each actor sees and what state results;
+- the same person acting again or reversing their action, such as accepting after declining, and a record corrected after someone was told: what each actor sees;
 - a message that promises a person will act, such as "a manager will review it": who, what they see, and by when;
-- two people or systems acting on the same thing at once. No default answer exists, so this is a question even when a requirement seems to cover it;
-- what happens to existing users, data, and integrations, and what switching the change off must do. The workspace shows only what is possible, so these are questions too;
+- what each actor sees when something the work relies on fails, and for things under way at go-live, such as an invoice issued before and paid after;
+- existing users, records, and integrations: what each sees change, including records made the old way;
 - which policy or design rules this work could break, through its behavior, current behavior it keeps, or a choice the plan might make. Check what the code does against each rule's words;
 - where two rules cannot both hold.
 
+Two people acting at once, rollback, switching off, and moving data over are the plan's, unless a likely answer changes what someone sees; then ask about that result, not the mechanism: what a buyer sees when stock runs out after they were told an item was held, not how a row is locked.
+
 ### 3. Settle what the sources settle; ask the rest
 
-Before writing a question, re-read the words of each rule it touches. If they settle the case, write a requirement marked `(required by C<n> (Short name))`. If the workspace answers a question of fact, write the fact with its marker. Don't ask about what the intent or workspace settles, how to build it, or a combination of cases each already settled.
+Before writing a question, re-read the words of each rule it touches. If they settle the case, write a requirement marked `(required by C<n> (Short name))`. Don't ask about what the intent or workspace settles, how to build it, or a combination of cases each already settled.
 
-Address each remaining gap to the role responsible for it: a policy's reading, exception, or waiver to the office or role the policy names as owner; a design limit, or a fact only an engineer can check, to the technical lead for that system; what counts as solving the problem, including a vague word in the outcome and the intent's own questions, to the originator; a case within another function's work, such as the front desk's or the refund team's, to the role running it; other product behavior to the product owner, or whoever decides the product's behavior. Name roles by responsibility, as in "privacy officer, or whoever approves new personal data collection", never people, even those a source names, and never "not named": a company may have nobody with the title, only someone holding the role or the closest function. A decider no source names is expected. One role decides each question, except that the owners of conflicting rules decide together; name another only to confirm an answer that could narrow the outcome (the originator) or make a constraint give way (its owner).
+Address each remaining gap to the role responsible for it: a policy's reading, exception, or waiver to the office or role the policy names as owner; a design limit, or a fact only an engineer can check, to the technical lead for that system; what counts as solving the problem, including a vague word in the outcome and the intent's own questions, to the originator; a case within another function's work, such as the front desk's, to the role running it; other product behavior to whoever decides the product's behavior. Name roles by responsibility, as in "privacy officer, or whoever approves new personal data collection", never people, even those a source names, and never "not named": a decider no source names is expected. One role decides each question, except that the owners of conflicting rules decide together; name another only to confirm an answer that could narrow the outcome (the originator) or make a constraint give way (its owner).
 
-Each question asks one thing: split one whose parts could get different answers, except that what one role decides about one item, holding back the same thing, is one question in numbered parts. For a choice, give two to four lettered likely answers with the trade-offs that matter, none marked as recommended.
+Each question asks one thing: split one whose parts could get different answers, except that what one role decides about one item, in one tier, is one question in numbered parts. For a choice, give two to four lettered likely answers with the trade-offs that matter, none marked as recommended.
 
-A question holds back only the case it is about, unless its answer would change the whole requirement; the rest is built and goes live. The held case stays off, and meanwhile the actor sees what they see today, as a Changes row or current behavior states. Write "Until decided" only when more waits: a whole requirement, its switching on, or a message contradicting what the new behavior already told them, such as one inviting a reply nobody reads. Without it, the requirement leaves the case out and names the question, as in "an order over the limit waits for Q4". Any other meanwhile is a decision: offer it only as a likely answer. A question whose every likely answer builds the same thing is no gap.
+Put each question in a tier. **Resolve before accepting**: a conflict; a policy's reading, exception, or waiver; any whose answer changes what gets built: a flow's steps, who qualifies or is told, an amount of money, what data is kept or shown, or a whole requirement. **Carry into the plan**: one whose likely answers differ only in a value, a wording, a label, or a format, such as a message's text, or in one case the plan can leave as a slot, kept off meanwhile with its actor seeing today's behavior, as a Changes row or current behavior states. When unsure, choose the first: a held merge costs a day; a guess built in costs a release.
 
-When a requirement and a rule, or two rules, cannot both hold, record the case under Conflicts. It is agreed only when a source records, with a date or place, the agreement of the role owning each rule that gives way. Otherwise the conflict line says `Unresolved: see Q<n>`, a question for those owners that holds back every case the conflict touches, because building either reading there decides it for them.
+No first-tier question is open once the spec is accepted, so none holds anything back: the requirement names it where its answer goes, as in "the full-refund deadline is set by Q1". A carry-over question holds back only its case, named where the requirement leaves it out, as in "an order over the limit waits for Q4". Write "Until decided" only when more must wait, such as a message's line inviting a reply nobody reads. Any other meanwhile is a decision: offer it only as a likely answer. A question whose every likely answer builds the same thing is no gap.
 
-Order the questions so that a reviewer who answers only their first few unblocks the most: those holding back a whole requirement or its switching on before those holding back one case; within each, the main flow, conflicts and policy readings, two actors at once, the switch-over, switching off, and promises first. Keep the count down by checking facts, merging as above, and asking only about cases an actor or reviewer would notice; never by leaving a gap out or capping the count, because a gap nobody asks about is decided by whoever builds it.
+When a requirement and a rule, or two rules, cannot both hold, record the case under Conflicts. It is agreed only when a source records, with a date or place, the agreement of the role owning each rule that gives way. Otherwise the conflict line says `Unresolved: see Q<n>`, a first-tier question for those owners, because building either reading decides it for them.
+
+In each tier, put conflicts and policy readings first, then the main flow. Keep the count down by checking facts and merging as above; never by leaving a gap out or capping the count, because a gap nobody asks about is decided by whoever builds it.
 
 ### 4. Write the spec
 
 Use the headings of [references/spec-template.md](references/spec-template.md) in order; its placeholders say what each slot holds. Write in the intent's language, but keep headings, ids, field names, markers, and `None.` in English. In a spec not in English, translate the Open questions note and the five question labels faithfully, each label still followed by a colon, and use the same labels in the note and on every question.
 
 - **Requirements**: one behavior someone outside can check per requirement; what only the inside can check is plan material or a constraint. Quote a message's exact wording only when someone decided it or depends on it, such as consent text, a promise about money or deadlines, or text another system parses; otherwise give its meaning. Each "then" names a value, a state, a message's meaning, or what the observer can do next.
-- **Changes to existing behavior**: one row per behavior in use that changes; when the new behavior needs scenarios, write a requirement and point the row at it. Whether it can be undone, when that depends on how the plan does it, is a decided value or a question.
+- **Changes to existing behavior**: one row per behavior in use that changes; when the new behavior needs scenarios, write a requirement and point the row at it.
 - **Constraints**: only rules this work could break. When a reader would need a reason the source doesn't give, ask the constraint's owner.
-- **Open questions**: start with the template's note, word for word or translated as above: it tells planners and builders, who may lack this skill, what waits. Keep each line to a sentence or two.
+- **Open questions**: start with the template's note, word for word or translated as above; it tells planners and builders what waits. Keep each line to a sentence or two.
   - Under "Depends on the answer", a question about a constraint also names the requirements it changes; a conflict names both items.
   - A question of fact gives, for each likely result, what is built as a decided value with its marker; if that is not decided, it also needs a decision.
-  - "Until decided" never holds back switching the change off, or a requirement that only keeps current behavior, and switching off is not what a waiting case does meanwhile. Don't write a requirement only to hold a waiting case.
+  - Only a carry-over question has an "Until decided" line, and it never holds back a whole requirement. Don't write a requirement only to hold a waiting case.
 
 Ids are stable once the spec is on a pull request: never renumber, and a removed item leaves a gap. Cite an item by id and current name, as in `R2 (Weekly limit)`.
 
@@ -97,27 +100,27 @@ Save in the workspace's `docs/specs/`, the one closest to the intent if there ar
 End with the file path and this block for the pull request description:
 
 ```
-Spec for <intent file>: <spec path>. <n> open questions.
+Spec for <intent file>: <spec path>. <a> questions to resolve before accepting, <b> to carry into the plan.
 
 Review requested from:
 - <Role, as under Reviewers>: reviewer to be assigned. Checks: <what, from Reviewers>. Answers: <Q<n> (Short name), … in the spec's order, or "none">.
 
-Reply to a question on this pull request; only the reviewer for the role it names decides it. Merging accepts the spec; questions still open wait in the plan, as its Open questions note says.
+Reply to a question on this pull request; only the reviewer for the role it names decides it. Merge to accept only once <first-tier Q<n>, …, or "no question"> are answered; `check-spec.sh --accept` fails until then, so the repository's branch protection can block the merge by requiring it as a status check.
 ```
 
 Whoever requests reviewers fills in who holds each role. Open the pull request only when asked and the environment can. Do not write the plan.
 
 ## Revise from review
 
-Take the spec, its pull request comments and reviews, pasted or fetched when tools allow (`gh pr view <n> --comments`, `gh api`), and who holds which role: the caller's statement, else the pull request description's reviewer list (step 7). Anyone else holds none; with neither, every answer is input, and the reply lines ask for the list. Edit the spec in place; an accepted one changes only through a new spec that supersedes it. Sort each comment:
+Take the spec, its pull request comments and reviews, pasted or fetched when tools allow, and who holds which role: the caller's statement, else the pull request description's reviewer list (step 7). Anyone else holds none; with neither, every answer is input, and the reply lines ask for the list. Edit the spec in place; an accepted one changes only through a new spec that supersedes it. Sort each comment:
 
-- **An answer from whoever holds the role the question's "Who answers" names**: write it into every line that names the question, marked `(decided by <role>, Q<n>)`, log it as the template shows (who answered, as the pull request shows them: the one person a spec names, as a record), update Status, and remove the question; its id is not reused. An answered part of a question closes alone, marked with the comment's link instead of Q<n>. If it narrows the outcome or makes a constraint give way and the role that must confirm that has not, keep it open and say which role still must. A boundary the answer leaves open is a new question.
+- **An answer from whoever holds the role the question's "Who answers" names**: write it into every line that names the question, marked `(decided by <role>, Q<n>)`, log it as the template shows (who answered, as the pull request shows them: the one person a spec names, as a record), update Status, and remove the question; its id is not reused. An answered part of a question closes alone, marked with the comment's link instead of Q<n>. If it narrows the outcome or makes a constraint give way and the role that must confirm that has not, keep it open and say which role still must. A boundary the answer leaves open is a new question, in the tier step 3 gives it.
 - **A question of fact**: settled by anyone who says what they found where; check it yourself first when you can.
 - **An answer from anyone else**, including a reviewer for another role: input, not a decision. The question stays open; add the answer as a likely answer if it is new.
 - **A behavior the spec doesn't settle**: a new question, as step 3 says, with the next unused id.
 - **Anything else**: fix wording or errors that change no decision; a fix that would is a new question for the decider.
 
-Then run step 5, and step 6 with one fresh reader, even for a small change, since an answer written in may decide a boundary its author left open. End with one reply line per comment for the caller to post: what changed where, or why the question stays open and which role must answer. Repeat the step 7 block if questions or their roles changed.
+Then run step 5, and step 6 with one fresh reader, even for a small change, since an answer written in may decide a boundary its author left open. Once no first-tier question is open, run step 5 with `--accept`. End with one reply line per comment for the caller to post: what changed where, or why the question stays open and which role must answer; then whether the spec can now be merged. Repeat the step 7 block if questions or their roles changed.
 
 ## Answers in conversation
 

@@ -1,5 +1,6 @@
 #!/bin/sh
-# check-spec.sh <spec.md>: check what a reader of spec.md alone cannot.
+# check-spec.sh [--accept] <spec.md>: check what a reader of spec.md alone cannot. The default mode is for drafts;
+# --accept also fails while any question under "Resolve before accepting" is open, as a required check before merge.
 # - Every R, C, Q and S id mentioned is defined once, and "R<n> (Name)", "C<n> (Name)" or "S<n> (Name)" uses its
 #   current name; S ids are defined under Sources, and "(current behavior, …)" cites one.
 # - Outside the header, Sources, fenced blocks, URLs and the intent's quoted words, no file path or code name
@@ -10,17 +11,22 @@
 # - From the intent quotes each outcome and open question of the file on the "Intent:" line.
 # - Open questions starts with the template's note word for word, or with a translation of it (a paragraph
 #   that is not mostly the note's English words and names the labels the note quotes, as the questions do).
-# - Each open question has the template's labeled lines, in order, the last ("Until decided") optional: the
-#   template's labels under the English note, otherwise the same translated labels on every question. A question
-#   without "Until decided" is named in Requirements, Changes, Constraints, Conflicts or Out of scope.
-# - The "Status:" line gives the number of open questions the section lists.
+# - Open questions has "### Resolve before accepting" then "### Carry into the plan", each listing questions or
+#   saying "None.", and no question outside them.
+# - Each open question has the template's labeled lines, in order, the last ("Until decided") optional and only
+#   under "Carry into the plan": the template's labels under the English note, otherwise the same translated labels
+#   on every question. A question without "Until decided" is named in Requirements, Changes, Constraints, Conflicts
+#   or Out of scope.
+# - The "Status:" line gives the number of questions under each tier, in that order.
 # - A Q id in the Decision log is closed: it is not also still open, and outside the Decision log it is named only
 #   in "(decided by …, Q<n>)" markers, which name only closed questions.
-# - Changes to existing behavior and Open questions are present and say "None." exactly when they list nothing.
+# - Changes to existing behavior is present and says "None." exactly when it lists nothing.
 # - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id.
 # Prints "file:line: problem" per finding. Exits 0 when clean, 1 on findings, 2 on a usage error.
 set -eu
-spec=${1:?usage: check-spec.sh <spec.md>}
+accept=0
+[ "${1:-}" != --accept ] || { accept=1; shift; }
+spec=${1:?usage: check-spec.sh [--accept] <spec.md>}
 [ -f "$spec" ] || { echo "check-spec: no such file: $spec" >&2; exit 2; }
 dir=$(dirname "$spec") template=$(dirname "$0")/../references/spec-template.md
 [ -f "$template" ] || { echo "check-spec: template not found: $template" >&2; exit 2; }
@@ -34,7 +40,7 @@ name=$(field Supersedes) old=/dev/null
 [ -z "$name" ] || old=$dir/$name
 [ -z "$name" ] || [ -f "$old" ] || { echo "$spec:1: superseded spec not found: $old"; exit 1; }
 
-awk -v SPEC="$spec" '
+awk -v SPEC="$spec" -v ACCEPT="$accept" '
 function report(l, m) { print SPEC ":" l ": " m; bad = 1 }
 function english_share(t,   a, n, i, w, hit) {   # share of the words of t that are words of the template note
   if (!n_ew) { w = tolower(note); gsub(/[^a-z]+/, " ", w); n_ew = split(w, a, " "); for (i = 1; i <= n_ew; i++) ew[a[i]] = 1 }
@@ -44,6 +50,7 @@ function english_share(t,   a, n, i, w, hit) {   # share of the words of t that 
 function endq(   k, want) {   # checks the labeled lines of the open question just read
   if (cq == "") return
   if (nf == ntl - 1) nound[cq] = cq_line
+  if (nf == ntl && cq_tier == 1) report(cq_line, cq " is to resolve before accepting, so it holds nothing back: remove its \"" lab[nf] "\" line, or move it to Carry into the plan")
   if (nf != ntl && nf != ntl - 1) report(cq_line, cq " has " nf " labeled lines; it needs " ntl - 1 " or " ntl ", as in the template")
   else for (k = 1; k <= nf; k++) {
     if (!eng && !(k in fl)) { fl[k] = lab[k]; if (tr != "" && index(note, "\"" tl[k] "\"") && !index(tr, lab[k]))
@@ -64,8 +71,8 @@ function is_def(   s) {   # sets ID and NM when this line defines an R, C, Q or 
 { sub(/\r$/, "") }
 FNR == 1 { for (f = 1; f < ARGC && ARGV[f] != FILENAME; f++) ; }
 f == 1 { if (/^## /) { tsec = $0; next }
-         if (tsec != "## Open questions" || !NF || /^</) next
-         if (/^- /) inq = 1
+         if (tsec != "## Open questions" || !NF || /^</ || /^#/ || tdone) next
+         if (/^- /) { if (inq) { tdone = 1; next } inq = 1 }
          else if (inq && match($0, /^[ \t]+- [^:]+:/)) { s = substr($0, 1, RLENGTH - 1); sub(/^[ \t]+- /, "", s); tl[++ntl] = s }
          else if (!inq && note == "") note = $0
          next }
@@ -90,6 +97,14 @@ function end_r() { if (cr != "" && !scn) report(cr_line, cr " has no scenario: a
 /^```/ { fence = !fence; next }
 fence { next }
 /^## / { endq(); end_r(); sec = substr($0, 4); seen[sec] = FNR; due = (sec == "Open questions"); next }
+sec == "Open questions" && /^### / { endq(); s = substr($0, 5); sub(/[ \t]+$/, "", s)
+  if (due) report(FNR, "Open questions must start with the template'"'"'s note, word for word, or its faithful translation"); due = 0
+  if (s == "Resolve before accepting" && !tier) tier = 1
+  else if (s == "Carry into the plan" && tier < 2) tier = 2
+  else { report(FNR, "\"" $0 "\": Open questions has only \"### Resolve before accepting\" then \"### Carry into the plan\""); next }
+  tline[tier] = FNR; next }
+sec == "Open questions" && tier && /^- / { titems[tier]++ }
+sec == "Open questions" && tier && /^None\.[ \t]*$/ { tnone[tier] = FNR }
 sec == "Requirements" && /^- / { scn = 1 }
 sec != "" && sec != "Sources" { s = $0; if (/^- (Outcome|Question) "/) gsub(/"[^"]*"/, "", s)
   if ((w = code_name(s)) != "") report(FNR, "\"" w "\" is a file or code name: say it in plain words and cite S<n> (Name); names go under Sources")
@@ -117,7 +132,9 @@ sec == "Decision log" && match($0, /^- Q[0-9]+/) { id = substr($0, 3, RLENGTH - 
 is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; line[ID] = FNR
   if (ID ~ /^R/) { end_r(); cr = ID; cr_line = FNR; scn = 0 }
   if (ID ~ /^Q/) open_q[ID] = 1
-  if (sec == "Open questions" && ID ~ /^Q/) { n_open++; endq(); cq = ID; cq_line = FNR; nf = 0 } }
+  if (sec == "Open questions" && ID ~ /^Q/) { endq(); cq = ID; cq_line = FNR; cq_tier = tier; nf = 0; n_tier[tier]++
+    if (!tier) report(FNR, ID " is under no tier: put it under \"### Resolve before accepting\" or \"### Carry into the plan\"")
+    else if (tier == 1 && ACCEPT == 1) report(FNR, ID " is still to resolve before accepting, so the spec cannot be accepted yet") } }
 { s = " " $0
   while (match(s, /[^A-Za-z0-9_][RCQS][0-9]+/)) {
     id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
@@ -139,16 +156,22 @@ END { endq(); end_r()
     else if (ref_nm[i] != "" && ref_nm[i] != name[id])
       report(ref_line[i], id " is cited as \"" ref_nm[i] "\" but is named \"" name[id] "\"")
   }
-  split("Changes to existing behavior|Open questions", must, "|")
-  for (i = 1; i <= 2; i++) { s = must[i]
-    if (!(s in seen)) report(1, "no \"## " s "\" section")
-    else if (!items[s] && !(s in none)) report(seen[s], "\"" s "\" lists nothing: write \"None.\" under it")
-    else if (items[s] && (s in none)) report(none[s], "\"" s "\" says \"None.\" but also lists items")
-  }
+  s = "Changes to existing behavior"
+  if (!(s in seen)) report(1, "no \"## " s "\" section")
+  else if (!items[s] && !(s in none)) report(seen[s], "\"" s "\" lists nothing: write \"None.\" under it")
+  else if (items[s] && (s in none)) report(none[s], "\"" s "\" says \"None.\" but also lists items")
+  split("Resolve before accepting|Carry into the plan", tn, "|")
+  if (!("Open questions" in seen)) report(1, "no \"## Open questions\" section")
+  else for (i = 1; i <= 2; i++)
+    if (!(i in tline)) report(seen["Open questions"], "Open questions has no \"### " tn[i] "\" heading")
+    else if (!titems[i] && !(i in tnone)) report(tline[i], "\"" tn[i] "\" lists nothing: write \"None.\" under it")
+    else if (titems[i] && (i in tnone)) report(tnone[i], "\"" tn[i] "\" says \"None.\" but also lists questions")
+  s = status; n = 0
+  while (match(s, /[0-9]+/)) { cnt[++n] = substr(s, RSTART, RLENGTH) + 0; s = substr(s, RSTART + RLENGTH) }
   if (!status_line) report(1, "no \"Status:\" line")
-  else if (!match(status, /[0-9]+/)) report(status_line, "Status: gives no number of open questions")
-  else if (substr(status, RSTART, RLENGTH) + 0 != n_open)
-    report(status_line, "Status: says " substr(status, RSTART, RLENGTH) " open questions, but Open questions lists " n_open)
+  else if (n != 2) report(status_line, "Status: must give two numbers: questions to resolve before accepting, then to carry into the plan")
+  else for (i = 1; i <= 2; i++) if (cnt[i] != n_tier[i] + 0)
+    report(status_line, "Status: says " cnt[i] " under \"" tn[i] "\", but it lists " n_tier[i] + 0)
   for (i = 1; i <= n_q; i++) if ((qref[i] in closed) && !(qref[i] in open_q))
     report(qref_line[i], qref[i] " is closed in the Decision log; write its answer here instead of naming it, or cite it as (decided by <role>, " qref[i] ")")
   for (i = 1; i <= n_m; i++) if ((mref[i] in open_q) && !(mref[i] in closed))
