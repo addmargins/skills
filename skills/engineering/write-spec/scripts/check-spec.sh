@@ -2,7 +2,10 @@
 # check-spec.sh <spec.md>: check what a reader of spec.md alone cannot.
 # - Every R, C and Q id mentioned is defined once, and "R<n> (Name)" or "C<n> (Name)" uses its current name.
 # - From the intent quotes each outcome and open question of the file on the "Intent:" line.
-# - Open questions starts with one of the template's notes (English or Korean), word for word.
+# - Open questions starts with the template's note word for word, or with a translation of it (a paragraph
+#   that is not mostly the note's English words and names the labels the note quotes, as the questions do).
+# - Each open question has the template's five labeled lines, in order: the template's labels under the
+#   English note, otherwise the same translated labels on every question.
 # - The "Status:" line gives the number of open questions the section lists.
 # - A Q id in the Decision log counts as defined, and is not also still open.
 # - Changes to existing behavior and Open questions are present and say "None." exactly when they list nothing.
@@ -26,6 +29,22 @@ name=$(field Supersedes) old=/dev/null
 
 awk -v SPEC="$spec" '
 function report(l, m) { print SPEC ":" l ": " m; bad = 1 }
+function english_share(t,   a, n, i, w, hit) {   # share of the words of t that are words of the template note
+  if (!n_ew) { w = tolower(note); gsub(/[^a-z]+/, " ", w); n_ew = split(w, a, " "); for (i = 1; i <= n_ew; i++) ew[a[i]] = 1 }
+  n = split(t, a, " "); for (i = 1; i <= n; i++) { w = a[i]; gsub(/[.,;:!?"()]/, "", w); hit += w ~ /^[A-Za-z]+$/ && (tolower(w) in ew) }
+  return n ? hit / n : 0
+}
+function endq(   k, want) {   # checks the labeled lines of the open question just read
+  if (cq == "") return
+  if (nf != ntl) report(cq_line, cq " has " nf " labeled lines; it needs " ntl ", as in the template")
+  else for (k = 1; k <= ntl; k++) {
+    if (!eng && !(k in fl)) { fl[k] = lab[k]; if (tr != "" && index(note, "\"" tl[k] "\"") && !index(tr, lab[k]))
+      report(cq_line, "the Open questions note does not name \"" lab[k] "\", the label " cq " uses for \"" tl[k] "\"") }
+    want = eng ? tl[k] : fl[k]
+    if (lab[k] != want) { report(cq_line, cq ": line " k " is labeled \"" lab[k] "\"; expected \"" want "\""); break }
+  }
+  cq = ""
+}
 function is_def(   s) {   # sets ID and NM when this line defines an R, C or Q
   if (sec == "Decision log") return 0
   if ($0 !~ /^### R[0-9]+\. / && $0 !~ /^- [CQ][0-9]+\. /) return 0
@@ -36,7 +55,12 @@ function is_def(   s) {   # sets ID and NM when this line defines an R, C or Q
 }
 { sub(/\r$/, "") }
 FNR == 1 { for (f = 1; f < ARGC && ARGV[f] != FILENAME; f++) ; }
-f == 1 { if (/^## /) on = /^## Open questions/; else if (/^- /) on = 0; else if (on && NF && !/^</) note[$0] = 1; next }
+f == 1 { if (/^## /) { tsec = $0; next }
+         if (tsec != "## Open questions" || !NF || /^</) next
+         if (/^- /) inq = 1
+         else if (inq && match($0, /^[ \t]+- [^:]+:/)) { s = substr($0, 1, RLENGTH - 1); sub(/^[ \t]+- /, "", s); tl[++ntl] = s }
+         else if (!inq && note == "") note = $0
+         next }
 f == 2 && /^## / { isec = $0; next }
 f == 2 { if ((isec == "## Desired outcome" || isec == "## Open questions") && NF && !/^[ \t]/ && !/^</) {
            s = $0; sub(/^[ \t]*(- )?/, "", s); sub(/[ \t.]*$/, "", s); if (s != "None") want[++n_want] = s; n_out += isec ~ /outcome/ }
@@ -45,8 +69,16 @@ f == 3 { if (is_def() && NM != "") old[NM] = ID; next }
 
 /^```/ { fence = !fence; next }
 fence { next }
-/^## / { sec = substr($0, 4); seen[sec] = FNR; due = (sec == "Open questions"); next }
-due && NF { due = 0; if ($0 in note) next; report(FNR, "Open questions must start with the template'"'"'s note, word for word") }
+/^## / { endq(); sec = substr($0, 4); seen[sec] = FNR; due = (sec == "Open questions"); next }
+due && NF { due = 0
+  if ($0 == note) { eng = 1; next }
+  if ($0 !~ /^(- |[ \t]|None\.)/ && english_share($0) <= 0.5) { tr = $0; next }
+  report(FNR, "Open questions must start with the template'"'"'s note, word for word, or its faithful translation") }
+cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w = index(s, "\357\274\232")   # ASCII or full-width colon
+  if (w && (!p || w < p)) { p = w; w = 3 } else w = 1
+  lab[++nf] = p ? substr(s, 1, p - 1) : ""
+  if (!p) report(FNR, cq " has a line with no label: start it with the label and a colon, as in the template")
+  else if (substr(s, p + w) ~ /^[ \t]*$/) report(FNR, cq " has an empty \"" lab[nf] "\" line") }
 /^- / { items[sec]++ }
 /^None\.[ \t]*$/ { none[sec] = FNR }
 sec == "" && /^Decided in conversation:[ \t]*[^ \t]/ { conv = 1 }
@@ -55,7 +87,8 @@ sec == "Decision log" && match($0, /^- Q[0-9]+/) { id = substr($0, 3, RLENGTH - 
   if (id in name) report(FNR, id " is in the Decision log but is also defined elsewhere"); name[id] = ""; line[id] = FNR }
 index($0, "(decided in conversation)") && !conv_line { conv_line = FNR }
 /^- (Outcome|Question) "/ { s = $0; sub(/^- [A-Za-z]+ "/, "", s); ledger = ledger "\n" s }
-is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; line[ID] = FNR; n_open += sec == "Open questions" && ID ~ /^Q/ }
+is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; line[ID] = FNR
+  if (sec == "Open questions" && ID ~ /^Q/) { n_open++; endq(); cq = ID; cq_line = FNR; nf = 0 } }
 { s = " " $0
   while (match(s, /[^A-Za-z0-9_][RCQ][0-9]+/)) {
     id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
@@ -64,7 +97,7 @@ is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; l
     if (id !~ /^Q/ && match(s, /^ \([^)]*\)/)) ref_nm[n_ref] = substr(s, 3, RLENGTH - 3)
   } }
 
-END {
+END { endq()
   for (i = 1; i <= n_ref; i++) { id = ref[i]
     if (!(id in name)) { if (!(id in told)) report(ref_line[i], id " is referenced but not defined"); told[id] = 1 }
     else if (ref_nm[i] != "" && ref_nm[i] != name[id])
