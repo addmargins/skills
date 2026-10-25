@@ -64,6 +64,10 @@ function check_banned(s, line,   n, i, w, t, p) {
     report(line, "vague word \"" words[i] "\": say the value, state, or next action instead")
   }
 }
+function marked(s) {
+  return index(s, "(decided by") || index(s, "(decided in conversation)") ||
+    s ~ /\(required by C[0-9]+ \(/ || s ~ /\(see [RC][0-9]+ \(/
+}
 function item_id(   s) { s = $2; sub(/\.$/, "", s); return s }
 function close_item() {                      # checks for the R or Q that just ended
   if (cur_r != "") {
@@ -159,13 +163,18 @@ cur_q != "" && /^[ \t]+- Until decided:/ {
     report(FNR, cur_q ": \"Until decided\" is neither \"do not build R<n>\" nor a value \"accepted by <decider>, <where>\"")
 }
 
-cur_r != "" && $0 !~ /^So that:/ && $0 !~ /^- / && index($0, "(decided by") == 0 {
-  # A number in a rule sentence comes from the intent, or names who decided it.
+# The short marker refers to the "Decided in conversation:" line, which names who and when.
+sec == "" && /^Decided in conversation:[ \t]*[^ \t]/ { has_conv = 1 }
+index($0, "(decided in conversation)") && !conv_line { conv_line = FNR }
+
+cur_r != "" && $0 !~ /^So that:/ && $0 !~ /^- / && !marked($0) {
+  # A number in a rule sentence comes from the intent, or says who decided it, the constraint
+  # that requires it, or the item it follows from.
   rest = $0
   while (match(rest, /[0-9]+([.:][0-9]+)?/)) {
     num = substr(rest, RSTART, RLENGTH); rest = substr(rest, RSTART + RLENGTH)
     if (index(intent_text, num) == 0)
-      report(FNR, cur_r ": " num " is not in the intent; add (decided by <who>, <where>) or make it an open question")
+      report(FNR, cur_r ": " num " is not in the intent; add (decided in conversation), (decided by <name>, <role>, <where>), or (required by C<n> (Short name)), or make it an open question")
   }
 }
 cur_r != "" && /^So that:/   { r_sothat = 1 }
@@ -197,6 +206,8 @@ sec != "Open questions" && sec != "From the intent" { check_banned($0, FNR) }
 
 END {
   close_item()
+  if (conv_line && !has_conv)
+    report(conv_line, "(decided in conversation) is used, but there is no \"Decided in conversation: <name>, <role>, <date>\" line")
   n = split(REQUIRED, req, "|")
   for (i = 1; i <= n; i++) if (!(req[i] in seen_sec)) report(1, "no \"## " req[i] "\" section")
   n = split(SAY_NONE, empty, "|")

@@ -13,7 +13,7 @@ The test for a finished spec: someone working only from spec.md never has to dec
 
 ## Principles
 
-- **Decisions are people's, not yours.** Every value, default, limit, and exclusion in the spec comes from the intent, from a source in the workspace, or from a named person. Mark each one not taken from the intent with `(decided by <name or role>, <where>)`, or `(current behavior, <source>)` for existing behavior you verified. A value you would propose goes under an open question as one of the likely answers, never into a requirement and never as a recommended answer.
+- **Decisions are people's, not yours.** Every value, default, limit, and exclusion in the spec comes from the intent, from a source in the workspace, or from a named person. Mark each one not taken from the intent with `(decided in conversation)` for the user's answers (see step 3), `(decided by <name>, <role>, <where>)` for anyone else's, `(current behavior, <source>)` for existing behavior you verified, or `(required by C<n> (Short name))` for behavior a constraint's own words require. Write a decided marker only for a person who decided it for this work; a policy owner decides nothing by having written the policy. A reading that goes beyond the constraint's words is a question for its owner. A value you would propose goes under an open question as one of the likely answers, never into a requirement and never as a recommended answer.
 - **Facts are yours to find.** Before asking anyone, read the workspace for how things work today and for the rules that apply: ADRs, policy documents, a `GLOSSARY.md`, the code. Separate what a document claims from what you verified. A question of fact goes under Open questions only when you could not check it, and says why.
 - **What, not how.** The spec states what an actor or another system observes, and the rules the work must follow. Module structure, files, types, and algorithms belong to the plan. Fix an interface or data format only when someone outside this build depends on it, or a stakeholder would notice if it changed: give one plain sentence saying what it is for, then a sample, or a link to the schema that owns it. Write a lifecycle as a table of state, event, next state, and who sees what.
 - **Plain words, one term per concept.** Use the glossary's terms, or the intent's terms when there is no glossary. Define a new term in one clause where it first appears. A term whose meaning stakeholders disagree on is an open question.
@@ -27,7 +27,7 @@ Take the intent file from the invocation arguments or the user's message. If the
 
 List each `docs/specs/` in the workspace and read any spec built on the same intent. If one exists, ask whether this is a revision of it.
 
-When a revision answers an open question that needed a decision, write the answer into each item named under the question's "Depends on the answer", with its `(decided by <name or role>, <where>)` marker. Update the From the intent and Policy conflicts lines that pointed at the question, then remove the question. Its id is not reused. Don't keep an answered question in the spec, or an `Answered:` line under it: its "Until decided" line would still hold the work back, and the answer would live in two places.
+When a revision answers an open question that needed a decision, write the answer into each item named under the question's "Depends on the answer", with its `(decided by <name>, <role>, <where>)` marker. Update the From the intent and Policy conflicts lines that pointed at the question, then remove the question. Its id is not reused. Don't keep an answered question in the spec, or an `Answered:` line under it: its "Until decided" line would still hold the work back, and the answer would live in two places.
 
 Read the parts of the workspace the intent touches: current behavior, the ADRs and policies that apply, and the glossary.
 
@@ -45,7 +45,7 @@ Draft the requirements in your head from the intent. For each, list what a build
 
 ### 3. Settle what the user can decide
 
-Ask the user about the gaps in short rounds of two or three numbered questions, each asking one thing. For a choice, give two to four lettered options with the trade-offs that matter. Record each answer as decided by the user, with the conversation and date as the place.
+Ask the user about the gaps in short rounds of two or three numbered questions, each asking one thing. For a choice, give two to four lettered options with the trade-offs that matter. Record each answer as decided by the user, by name and role, because the spec's readers don't know who "the user" was. Use the name and role the user gives you in this conversation; don't take them from the account, the session, or the workspace. If you don't know them, ask in your first round. Write them and the date once, in the spec's `Decided in conversation:` line, and mark each answer `(decided in conversation)`. That line names one conversation: a revision keeps the line it inherits and marks the answers from its own conversation in full, as in `(decided by Sam Lee, club manager, conversation of 2026-10-14)`.
 
 When the user is not the person who decides something, such as a policy owner, ask who is, and leave it as an open question naming them. When the user doesn't know, leave it open instead of rephrasing until they guess. Don't ask about what the intent or the workspace already settles, or about how to build it.
 
@@ -77,14 +77,14 @@ Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>`. It needs a 
 You can't run the spec's test yourself, because you fill gaps from this conversation without noticing. Give spec.md and the intent, and nothing else, to a fresh subagent, on a different model when one is available, with this request:
 
 > You will build from this spec and can't ask anyone. List at most 12 items, most important first, in three groups:
-> 1. Unmarked behavior: each sentence in a requirement or a Changes row that states a value or behavior the intent does not state and that has no "(decided by …)" or "(current behavior, …)" marker. Give the id and quote the sentence.
+> 1. Unmarked behavior: each sentence in a requirement or a Changes row that states a value or behavior the intent does not state and that has none of these markers: "(decided by …)"; "(decided in conversation)", which refers to the person and date on the spec's "Decided in conversation:" line; "(current behavior, …)"; "(required by C<n> …)"; or "(see R<n> …)" or "(see C<n> …)", which points to the item it follows from. Give the id and quote the sentence.
 > 2. Choices someone outside would notice: each behavior you would have to choose on your own where a user, a stakeholder, or another system would see a different result depending on your choice. Give the R or C id, the situation with literal values, and the two results they would see. Leave out how to build it: data formats, encodings, retries, duplicate deliveries, message length, ordering or timing below what a person would notice, and failures nobody outside sees.
 > 3. Each Summary claim that no requirement backs, and each "Until decided" line that holds back something the spec decides elsewhere, or lets something go ahead that the answer would change.
 
 Sort each item into one of three cases:
 
-- **Settled but not written**: you can cite the conversation turn or the workspace file that settled it. Write it in with its marker. If you can't cite one, it is not settled.
-- **Not a gap**: the result follows from a requirement or constraint as written, and you can cite it; or the situation can't happen given current behavior the spec states; or only the people building it would notice. Drop it.
+- **Settled but not written**: you can quote the user's words from the conversation, or name the workspace file and the line, that settle it. Write it in with its marker. A paraphrase, a gloss, or your reading of an answer is not a citation; the item is then a gap.
+- **Not a gap**: the result follows from a requirement or constraint as written, and you can cite it; or the situation can't happen given current behavior the spec states; or only the people building it would notice. Drop it. If the reader flagged a sentence that only restates or follows from another item, cite that item in place of a marker, as in `(see R2 (Weekly limit))`, or delete the sentence. Don't give it a new marker.
 - **A gap**: settle it with the user in one round as in step 3, or add an open question naming who decides. Never fill one in yourself.
 
 Then run step 5 and this step once more, giving a new reader only the changed spec and the intent. Stop after that second reader, even if it lists new items. Sort each item it lists as above, and put any gap you can't settle under Open questions. Don't add requirements just to answer the reader.

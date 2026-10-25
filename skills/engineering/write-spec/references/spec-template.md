@@ -4,12 +4,14 @@ Intent: <file name of the accepted intent document>
 
 Supersedes: <earlier spec file name, only when this revises one>
 
+Decided in conversation: <the user's name, role, and the conversation's date, only when a marker says (decided in conversation)>
+
 ## Summary
 <Two or three sentences a non-engineer can follow: the problem from the intent, who this is for, and what they will see or be able to do once it is built.>
 
 ## Requirements
 ### R1. <Actor>: <short name>
-<What must be true, in "must" sentences, as the actor or another system observes it. Mark each value not taken from the intent: (decided by <name or role>, <where>).>
+<What must be true, in "must" sentences, as the actor or another system observes it. Mark each value not taken from the intent: (decided in conversation), (decided by <name>, <role>, <where>), (current behavior, <source>), or (required by C<n> (Short name)).>
 
 So that: <the intent outcome or scope item this serves, in the intent's words>.
 
@@ -27,14 +29,14 @@ So that: <the intent outcome or scope item this serves, in the intent's words>.
 - <R<n> (Short name) and C<n> (Short name): the case where both cannot hold.> <Agreed with <policy owner>, <date or where>: <which wins, or the exception granted> | Unresolved: see Q<n>.>
 
 ## Out of scope
-- <What a reader might expect this to cover but it does not, and why when a reason was given. For an exclusion the intent does not make: (decided by <name or role>, <where>).>
+- <What a reader might expect this to cover but it does not, and why when a reason was given. For an exclusion the intent does not make: (decided in conversation) or (decided by <name>, <role>, <where>).>
 
 ## From the intent
 - Outcome "<desired outcome, quoted>": <R<n> (Short name), …>.
 - Question "<intent open question, quoted>": <answered by R<n> (Short name) | carried as Q<n> | no longer applies: <reason>, agreed by <intent originator>, <where>>.
 
 ## Open questions
-Until a question below is answered, plan and build the items named under its "Depends on the answer" only as its "Until decided" line says, and list them in the plan as waiting on that question. Anyone may settle a question of fact by checking it and recording what they found and where. To close a question that needs a decision, revise this spec: write the answer into each item named under its "Depends on the answer", marked (decided by <name or role>, <where>), update the From the intent and Policy conflicts lines that point at the question, and remove the question. Its id is not reused. Everything else in this spec is decided. If you find a behavior that a user, a stakeholder, or another system would notice and this spec does not settle, add a question here instead of choosing; how to build it is the plan's choice.
+Until a question below is answered, plan and build the items named under its "Depends on the answer" only as its "Until decided" line says, and list them in the plan as waiting on that question. Anyone may settle a question of fact by checking it and recording what they found and where. To close a question that needs a decision, revise this spec: write the answer into each item named under its "Depends on the answer", marked (decided by <name>, <role>, <where>), update the From the intent and Policy conflicts lines that point at the question, and remove the question. Its id is not reused. Everything else in this spec is decided. If you find a behavior that a user, a stakeholder, or another system would notice and this spec does not settle, add a question here instead of choosing; how to build it is the plan's choice.
 
 - Q1. <What is unclear.>
   - Depends on the answer: <which R or C items change, and how, for each likely answer.>
