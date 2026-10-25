@@ -13,8 +13,6 @@ Decided in conversation: <the user's name, role, and the conversation's date, on
 ### R1. <Actor>: <short name>
 <What must be true, in "must" sentences, as the actor or another system observes it. Mark each value not taken from the intent: (decided in conversation), (decided by <name>, <role>, <where>), (current behavior, <source>), or (required by C<n> (Short name)).>
 
-So that: <the intent outcome or scope item this serves, in the intent's words>.
-
 - Given <situation, with actual values>, when <action>, then <what is seen or returned, with actual values or state>.
 - <Another case only when its result does not follow from the rule above.>
 
@@ -41,4 +39,4 @@ Until a question below is answered, plan and build the items named under its "De
 - Q1. <What is unclear.>
   - Depends on the answer: <which R or C items change, and how, for each likely answer.>
   - To resolve: <the decision to make and who makes it, or the fact to check and why it could not be checked while writing.>
-  - Until decided: <"do not build R<n> (Short name)", or "build R<n> (Short name) with <what to build meanwhile>, accepted by <decider>, <where>".>
+  - Until decided: <"do not build R<n> (Short name)"; "do not build R<n> (Short name) for <the case that waits>; meanwhile <what that case does, with its marker>"; or "build R<n> (Short name) with <what to build meanwhile>, accepted by <decider>, <where>".>
