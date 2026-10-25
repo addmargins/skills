@@ -5,6 +5,8 @@
 # - Outside the header, Sources, fenced blocks, URLs and the intent's quoted words, no file path or code name
 #   (camelCase, snake_case, or a backticked identifier) appears: non-engineers read that prose.
 # - Each requirement has a scenario; each constraint has Kind:, Source: and Owner:, and no "Reason: not stated".
+# - No Reviewers or Conflicts line, constraint Owner:, or question's "Who answers" line says "not named" or
+#   "unnamed": each gives a role, by its responsibility.
 # - From the intent quotes each outcome and open question of the file on the "Intent:" line.
 # - Open questions starts with the template's note word for word, or with a translation of it (a paragraph
 #   that is not mostly the note's English words and names the labels the note quotes, as the questions do).
@@ -81,6 +83,8 @@ function code_name(t,   a, n, i, w) {   # the first file path or code name in t,
       || w ~ /`[^`]*([a-z]\.[a-z]|\(\))[^`]*`/) { gsub(/^[^A-Za-z0-9_`]+|[^A-Za-z0-9_`]+$/, "", w); return w } }
   return ""
 }
+function no_role(l, t) { if (tolower(t) ~ /not named|unnamed/)
+  report(l, "\"not named\" is not a role: name the role by its responsibility, such as \"owner of <policy>\" or \"whoever decides <product>'"'"'s behavior\"") }
 function end_r() { if (cr != "" && !scn) report(cr_line, cr " has no scenario: add a case under it"); cr = "" }
 
 /^```/ { fence = !fence; next }
@@ -91,7 +95,9 @@ sec != "" && sec != "Sources" { s = $0; if (/^- (Outcome|Question) "/) gsub(/"[^
   if ((w = code_name(s)) != "") report(FNR, "\"" w "\" is a file or code name: say it in plain words and cite S<n> (Name); names go under Sources")
   s = $0; while (match(s, /\(current behavior, [^)]*/)) { if (substr(s, RSTART, RLENGTH) !~ /, S[0-9]+/) report(FNR, "a (current behavior, …) marker must cite S<n> (Name) from Sources"); s = substr(s, RSTART + RLENGTH) } }
 sec == "Constraints" && /^- C[0-9]+\. / { for (k = split("Kind:|Source:|Owner:", cf, "|"); k; k--) if (!index($0, cf[k])) report(FNR, "constraint has no \"" cf[k] "\"")
-  if ($0 ~ /Reason:[ \t]*(not stated|none|n\/a|unknown)/) report(FNR, "omit Reason when the source states none") }
+  if ($0 ~ /Reason:[ \t]*(not stated|none|n\/a|unknown)/) report(FNR, "omit Reason when the source states none")
+  if (p = index($0, "Owner:")) no_role(FNR, substr($0, p)) }
+(sec == "Reviewers" || sec == "Conflicts") && /^- / { no_role(FNR, $0) }
 due && NF { due = 0
   if ($0 == note) { eng = 1; next }
   if ($0 !~ /^(- |[ \t]|None\.)/ && english_share($0) <= 0.5) { tr = $0; next }
@@ -100,7 +106,8 @@ cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w 
   if (w && (!p || w < p)) { p = w; w = 3 } else w = 1
   lab[++nf] = p ? substr(s, 1, p - 1) : ""
   if (!p) report(FNR, cq " has a line with no label: start it with the label and a colon, as in the template")
-  else if (substr(s, p + w) ~ /^[ \t]*$/) report(FNR, cq " has an empty \"" lab[nf] "\" line") }
+  else if (substr(s, p + w) ~ /^[ \t]*$/) report(FNR, cq " has an empty \"" lab[nf] "\" line")
+  else if (tl[nf] == "Who answers") no_role(FNR, substr(s, p + w)) }
 /^- / { items[sec]++ }
 /^None\.[ \t]*$/ { none[sec] = FNR }
 sec == "" && /^Status:/ { status = $0; status_line = FNR }
@@ -143,7 +150,7 @@ END { endq(); end_r()
   else if (substr(status, RSTART, RLENGTH) + 0 != n_open)
     report(status_line, "Status: says " substr(status, RSTART, RLENGTH) " open questions, but Open questions lists " n_open)
   for (i = 1; i <= n_q; i++) if ((qref[i] in closed) && !(qref[i] in open_q))
-    report(qref_line[i], qref[i] " is closed in the Decision log; write its answer here instead of naming it, or cite it as (decided by <name>, <role>, " qref[i] ")")
+    report(qref_line[i], qref[i] " is closed in the Decision log; write its answer here instead of naming it, or cite it as (decided by <role>, " qref[i] ")")
   for (i = 1; i <= n_m; i++) if ((mref[i] in open_q) && !(mref[i] in closed))
     report(mref_line[i], mref[i] " is still open, so a (decided by …) marker cannot cite it")
   for (id in nound) if (!(id in held))
