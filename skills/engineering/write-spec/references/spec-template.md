@@ -4,8 +4,6 @@ Intent: <file name of the accepted intent>
 
 Supersedes: <earlier spec file name, only when this revises one>
 
-Decided in conversation: <name, role, and date, only if a marker says (decided in conversation)>
-
 Status: <number> open questions.
 
 ## Summary
@@ -49,8 +47,8 @@ Until a question is answered, build what its "Depends on the answer" names only 
   - What is unclear: <one sentence.>
   - Depends on the answer: <for each likely answer, which R or C items change and how.>
   - To resolve: <the decision to make, or the fact to check and why it could not be checked yet.>
-  - Who answers: <role and name, as under Reviewers.>
-  - Until decided: <"build R<n> (Short name) except <the case that waits>", or, when all of it waits, "do not build R<n> (Short name)" or "build R<n> (Short name) but do not switch it on"; then "meanwhile, <the actor> sees <an accepted meanwhile with its marker, else what this spec already says they see, such as a Changes row's Today>".>
+  - Who answers: <role and name, as under Reviewers; when more than one, what each decides or confirms.>
+  - Until decided: <"build R<n> (Short name) except <the case that waits>", or, when all of it waits, "do not build R<n> (Short name)" or "build R<n> (Short name) but do not switch it on"; then "meanwhile, <the actor> sees <what this spec already says they see, such as a Changes row's Today>". Or "nothing waits", when every likely answer builds the same thing.>
 
 ## Decision log
 - Q<n> (<short name>): <the answer>. <Name>, <role>, <pull request comment link, or "conversation">, <date>. <Lines it changed are marked (decided by <name>, <role>, Q<n>).>

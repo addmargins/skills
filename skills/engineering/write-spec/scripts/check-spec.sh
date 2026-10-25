@@ -7,10 +7,10 @@
 # - Each open question has the template's five labeled lines, in order: the template's labels under the
 #   English note, otherwise the same translated labels on every question.
 # - The "Status:" line gives the number of open questions the section lists.
-# - A Q id in the Decision log counts as defined, and is not also still open.
+# - A Q id in the Decision log is closed: it is not also still open, and outside the Decision log it is named only
+#   in "(decided by …, Q<n>)" markers, which name only closed questions.
 # - Changes to existing behavior and Open questions are present and say "None." exactly when they list nothing.
 # - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id.
-# - "(decided in conversation)" is used only with a "Decided in conversation:" line.
 # Prints "file:line: problem" per finding. Exits 0 when clean, 1 on findings, 2 on a usage error.
 set -eu
 spec=${1:?usage: check-spec.sh <spec.md>}
@@ -81,13 +81,12 @@ cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w 
   else if (substr(s, p + w) ~ /^[ \t]*$/) report(FNR, cq " has an empty \"" lab[nf] "\" line") }
 /^- / { items[sec]++ }
 /^None\.[ \t]*$/ { none[sec] = FNR }
-sec == "" && /^Decided in conversation:[ \t]*[^ \t]/ { conv = 1 }
 sec == "" && /^Status:/ { status = $0; status_line = FNR }
 sec == "Decision log" && match($0, /^- Q[0-9]+/) { id = substr($0, 3, RLENGTH - 2)
-  if (id in name) report(FNR, id " is in the Decision log but is also defined elsewhere"); name[id] = ""; line[id] = FNR }
-index($0, "(decided in conversation)") && !conv_line { conv_line = FNR }
+  if (id in name) report(FNR, id " is in the Decision log but is also defined elsewhere"); name[id] = ""; line[id] = FNR; closed[id] = 1 }
 /^- (Outcome|Question) "/ { s = $0; sub(/^- [A-Za-z]+ "/, "", s); ledger = ledger "\n" s }
 is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; line[ID] = FNR
+  if (ID ~ /^Q/) open_q[ID] = 1
   if (sec == "Open questions" && ID ~ /^Q/) { n_open++; endq(); cq = ID; cq_line = FNR; nf = 0 } }
 { s = " " $0
   while (match(s, /[^A-Za-z0-9_][RCQ][0-9]+/)) {
@@ -96,6 +95,12 @@ is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; l
     ref[++n_ref] = id; ref_line[n_ref] = FNR; ref_nm[n_ref] = ""
     if (id !~ /^Q/ && match(s, /^ \([^)]*\)/)) ref_nm[n_ref] = substr(s, 3, RLENGTH - 3)
   } }
+sec != "Decision log" { s = " " $0; m = ""   # Q ids inside "(decided by …)" markers, and outside them
+  while (match(s, /\(decided by [^()]*\)/)) { m = m " " substr(s, RSTART, RLENGTH); s = substr(s, 1, RSTART - 1) " " substr(s, RSTART + RLENGTH) }
+  while (match(s, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
+    if (s !~ /^[A-Za-z0-9_]/) { qref[++n_q] = id; qref_line[n_q] = FNR } }
+  while (match(m, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(m, RSTART + 1, RLENGTH - 1); m = substr(m, RSTART + RLENGTH)
+    if (m !~ /^[A-Za-z0-9_]/) { mref[++n_m] = id; mref_line[n_m] = FNR } } }
 
 END { endq()
   for (i = 1; i <= n_ref; i++) { id = ref[i]
@@ -113,7 +118,10 @@ END { endq()
   else if (!match(status, /[0-9]+/)) report(status_line, "Status: gives no number of open questions")
   else if (substr(status, RSTART, RLENGTH) + 0 != n_open)
     report(status_line, "Status: says " substr(status, RSTART, RLENGTH) " open questions, but Open questions lists " n_open)
-  if (conv_line && !conv) report(conv_line, "(decided in conversation) is used, but there is no \"Decided in conversation:\" line")
+  for (i = 1; i <= n_q; i++) if ((qref[i] in closed) && !(qref[i] in open_q))
+    report(qref_line[i], qref[i] " is closed in the Decision log; write its answer here instead of naming it, or cite it as (decided by <name>, <role>, " qref[i] ")")
+  for (i = 1; i <= n_m; i++) if ((mref[i] in open_q) && !(mref[i] in closed))
+    report(mref_line[i], mref[i] " is still open, so a (decided by …) marker cannot cite it")
   if (!n_out) report(1, "found no \"## Desired outcome\" items in the intent; check its headings")
   for (i = 1; i <= n_want; i++) if (!index(ledger, "\n" want[i]))
     report(1, "From the intent: no Outcome or Question line quoting \"" want[i] "\"")
