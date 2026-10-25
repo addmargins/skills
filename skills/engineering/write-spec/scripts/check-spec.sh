@@ -15,7 +15,8 @@ dir=$(dirname "$spec") template=$(dirname "$0")/../references/spec-template.md
 field() { awk -v k="$1:" '{ sub(/\r$/, "") } index($0, k) == 1 { sub(/^[^:]*:[ \t]*/, ""); print; exit }' "$spec"; }
 
 name=$(field Intent) intent=
-for f in "$dir/$name" "$dir/../intents/$name"; do [ -n "$name" ] && [ -f "$f" ] && { intent=$f; break; }; done
+for f in "$dir/../intents/$name" "$dir/$name"; do   # never the spec itself, which may share its file name
+  [ -n "$name" ] && [ -f "$f" ] && [ "$f" != "$dir/${spec##*/}" ] && { intent=$f; break; }; done
 [ -n "$intent" ] || { echo "$spec:1: Intent: line missing, or intent file not found: ${name:-none}"; exit 1; }
 name=$(field Supersedes) old=/dev/null
 [ -z "$name" ] || old=$dir/$name
