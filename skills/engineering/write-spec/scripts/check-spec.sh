@@ -1,32 +1,28 @@
 #!/bin/sh
-# check-spec.sh [--accept] <spec.md>: check what a reader of spec.md alone cannot. The default mode is for drafts;
-# --accept also fails while any question under "Resolve before accepting" is open, as a required check before merge.
+# check-spec.sh <spec.md>: check what a reader of spec.md alone cannot.
 # - Every R, C, Q and S id mentioned is defined once, and "R<n> (Name)", "C<n> (Name)" or "S<n> (Name)" uses its
 #   current name; S ids are defined under Sources, and "(current behavior, …)" cites one.
 # - Outside the header, Sources, fenced blocks, URLs and the intent's quoted words, no file path or code name
 #   (camelCase, snake_case, or a backticked identifier) appears: non-engineers read that prose.
 # - Each requirement has a scenario; each constraint has Kind:, Source: and Owner:, and no "Reason: not stated".
-# - No Reviewers or Conflicts line, constraint Owner:, or question's "Who answers" line says "not named" or
+# - No Roles or Conflicts line, constraint Owner:, or question's "Who answers" line says "not named" or
 #   "unnamed": each gives a role, by its responsibility.
 # - From the intent quotes each outcome and open question of the file on the "Intent:" line.
 # - Open questions starts with the template's note word for word, or with a translation of it (a paragraph
 #   that is not mostly the note's English words and names the labels the note quotes, as the questions do).
-# - Open questions has "### Resolve before accepting" then "### Carry into the plan", each listing questions or
+# - Open questions has "### Decide before building" then "### Can wait for planning", each listing questions or
 #   saying "None.", and no question outside them.
 # - Each open question has the template's labeled lines, in order, the last ("Until decided") optional and only
-#   under "Carry into the plan": the template's labels under the English note, otherwise the same translated labels
-#   on every question. A question without "Until decided" is named in Requirements, Changes, Constraints, Conflicts
-#   or Out of scope.
+#   under "Can wait for planning": the template's labels under the English note, otherwise the same translated
+#   labels on every question. A question without "Until decided" is named where its case is left out: in
+#   Requirements, Changes, Constraints, Conflicts or Out of scope.
 # - The "Status:" line gives the number of questions under each tier, in that order.
-# - A Q id in the Decision log is closed: it is not also still open, and outside the Decision log it is named only
-#   in "(decided by …, Q<n>)" markers, which name only closed questions.
+# - No "(decided by …)" marker cites an open question.
 # - Changes to existing behavior is present and says "None." exactly when it lists nothing.
 # - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id.
 # Prints "file:line: problem" per finding. Exits 0 when clean, 1 on findings, 2 on a usage error.
 set -eu
-accept=0
-[ "${1:-}" != --accept ] || { accept=1; shift; }
-spec=${1:?usage: check-spec.sh [--accept] <spec.md>}
+spec=${1:?usage: check-spec.sh <spec.md>}
 [ -f "$spec" ] || { echo "check-spec: no such file: $spec" >&2; exit 2; }
 dir=$(dirname "$spec") template=$(dirname "$0")/../references/spec-template.md
 [ -f "$template" ] || { echo "check-spec: template not found: $template" >&2; exit 2; }
@@ -40,7 +36,7 @@ name=$(field Supersedes) old=/dev/null
 [ -z "$name" ] || old=$dir/$name
 [ -z "$name" ] || [ -f "$old" ] || { echo "$spec:1: superseded spec not found: $old"; exit 1; }
 
-awk -v SPEC="$spec" -v ACCEPT="$accept" '
+awk -v SPEC="$spec" '
 function report(l, m) { print SPEC ":" l ": " m; bad = 1 }
 function english_share(t,   a, n, i, w, hit) {   # share of the words of t that are words of the template note
   if (!n_ew) { w = tolower(note); gsub(/[^a-z]+/, " ", w); n_ew = split(w, a, " "); for (i = 1; i <= n_ew; i++) ew[a[i]] = 1 }
@@ -50,7 +46,7 @@ function english_share(t,   a, n, i, w, hit) {   # share of the words of t that 
 function endq(   k, want) {   # checks the labeled lines of the open question just read
   if (cq == "") return
   if (nf == ntl - 1) nound[cq] = cq_line
-  if (nf == ntl && cq_tier == 1) report(cq_line, cq " is to resolve before accepting, so it holds nothing back: remove its \"" lab[nf] "\" line, or move it to Carry into the plan")
+  if (nf == ntl && cq_tier == 1) report(cq_line, cq " is to decide before building, so nothing is built around it meanwhile: remove its \"" lab[nf] "\" line, or move it to Can wait for planning")
   if (nf != ntl && nf != ntl - 1) report(cq_line, cq " has " nf " labeled lines; it needs " ntl - 1 " or " ntl ", as in the template")
   else for (k = 1; k <= nf; k++) {
     if (!eng && !(k in fl)) { fl[k] = lab[k]; if (tr != "" && index(note, "\"" tl[k] "\"") && !index(tr, lab[k]))
@@ -61,7 +57,6 @@ function endq(   k, want) {   # checks the labeled lines of the open question ju
   cq = ""
 }
 function is_def(   s) {   # sets ID and NM when this line defines an R, C, Q or S
-  if (sec == "Decision log") return 0
   if ($0 !~ /^### R[0-9]+\. / && $0 !~ /^- [CQ][0-9]+\. / && !(sec == "Sources" && $0 ~ /^- S[0-9]+\. /)) return 0
   s = $0; sub(/^(### |- )/, "", s); ID = s; sub(/\..*/, "", ID); NM = s
   sub(/^R[0-9]+\. ([^:]*: )?/, "", NM); if (ID ~ /^[CS]/) { sub(/^[CS][0-9]+\. /, "", NM); sub(/:.*/, "", NM) }
@@ -99,9 +94,9 @@ fence { next }
 /^## / { endq(); end_r(); sec = substr($0, 4); seen[sec] = FNR; due = (sec == "Open questions"); next }
 sec == "Open questions" && /^### / { endq(); s = substr($0, 5); sub(/[ \t]+$/, "", s)
   if (due) report(FNR, "Open questions must start with the template'"'"'s note, word for word, or its faithful translation"); due = 0
-  if (s == "Resolve before accepting" && !tier) tier = 1
-  else if (s == "Carry into the plan" && tier < 2) tier = 2
-  else { report(FNR, "\"" $0 "\": Open questions has only \"### Resolve before accepting\" then \"### Carry into the plan\""); next }
+  if (s == "Decide before building" && !tier) tier = 1
+  else if (s == "Can wait for planning" && tier < 2) tier = 2
+  else { report(FNR, "\"" $0 "\": Open questions has only \"### Decide before building\" then \"### Can wait for planning\""); next }
   tline[tier] = FNR; next }
 sec == "Open questions" && tier && /^- / { titems[tier]++ }
 sec == "Open questions" && tier && /^None\.[ \t]*$/ { tnone[tier] = FNR }
@@ -112,7 +107,7 @@ sec != "" && sec != "Sources" { s = $0; if (/^- (Outcome|Question) "/) gsub(/"[^
 sec == "Constraints" && /^- C[0-9]+\. / { for (k = split("Kind:|Source:|Owner:", cf, "|"); k; k--) if (!index($0, cf[k])) report(FNR, "constraint has no \"" cf[k] "\"")
   if ($0 ~ /Reason:[ \t]*(not stated|none|n\/a|unknown)/) report(FNR, "omit Reason when the source states none")
   if (p = index($0, "Owner:")) no_role(FNR, substr($0, p)) }
-(sec == "Reviewers" || sec == "Conflicts") && /^- / { no_role(FNR, $0) }
+(sec == "Roles" || sec == "Conflicts") && /^- / { no_role(FNR, $0) }
 due && NF { due = 0
   if ($0 == note) { eng = 1; next }
   if ($0 !~ /^(- |[ \t]|None\.)/ && english_share($0) <= 0.5) { tr = $0; next }
@@ -126,15 +121,12 @@ cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w 
 /^- / { items[sec]++ }
 /^None\.[ \t]*$/ { none[sec] = FNR }
 sec == "" && /^Status:/ { status = $0; status_line = FNR }
-sec == "Decision log" && match($0, /^- Q[0-9]+/) { id = substr($0, 3, RLENGTH - 2)
-  if (id in name) report(FNR, id " is in the Decision log but is also defined elsewhere"); name[id] = ""; line[id] = FNR; closed[id] = 1 }
 /^- (Outcome|Question) "/ { s = $0; sub(/^- [A-Za-z]+ "/, "", s); ledger = ledger "\n" s }
 is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; line[ID] = FNR
   if (ID ~ /^R/) { end_r(); cr = ID; cr_line = FNR; scn = 0 }
   if (ID ~ /^Q/) open_q[ID] = 1
   if (sec == "Open questions" && ID ~ /^Q/) { endq(); cq = ID; cq_line = FNR; cq_tier = tier; nf = 0; n_tier[tier]++
-    if (!tier) report(FNR, ID " is under no tier: put it under \"### Resolve before accepting\" or \"### Carry into the plan\"")
-    else if (tier == 1 && ACCEPT == 1) report(FNR, ID " is still to resolve before accepting, so the spec cannot be accepted yet") } }
+    if (!tier) report(FNR, ID " is under no tier: put it under \"### Decide before building\" or \"### Can wait for planning\"") } }
 { s = " " $0
   while (match(s, /[^A-Za-z0-9_][RCQS][0-9]+/)) {
     id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
@@ -142,11 +134,10 @@ is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; l
     ref[++n_ref] = id; ref_line[n_ref] = FNR; ref_nm[n_ref] = ""
     if (id !~ /^Q/ && match(s, /^ \([^)]*\)/)) ref_nm[n_ref] = substr(s, 3, RLENGTH - 3)
   } }
-sec != "Decision log" { s = " " $0; m = ""   # Q ids inside "(decided by …)" markers, and outside them
+{ s = " " $0; m = ""   # Q ids inside "(decided by …)" markers, and outside them
   while (match(s, /\(decided by [^()]*\)/)) { m = m " " substr(s, RSTART, RLENGTH); s = substr(s, 1, RSTART - 1) " " substr(s, RSTART + RLENGTH) }
   while (match(s, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
-    if (s !~ /^[A-Za-z0-9_]/) { qref[++n_q] = id; qref_line[n_q] = FNR
-      if (sec ~ /^(Requirements|Changes to existing behavior|Constraints|Conflicts|Out of scope)$/) held[id] = 1 } }
+    if (s !~ /^[A-Za-z0-9_]/ && sec ~ /^(Requirements|Changes to existing behavior|Constraints|Conflicts|Out of scope)$/) held[id] = 1 }
   while (match(m, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(m, RSTART + 1, RLENGTH - 1); m = substr(m, RSTART + RLENGTH)
     if (m !~ /^[A-Za-z0-9_]/) { mref[++n_m] = id; mref_line[n_m] = FNR } } }
 
@@ -160,7 +151,7 @@ END { endq(); end_r()
   if (!(s in seen)) report(1, "no \"## " s "\" section")
   else if (!items[s] && !(s in none)) report(seen[s], "\"" s "\" lists nothing: write \"None.\" under it")
   else if (items[s] && (s in none)) report(none[s], "\"" s "\" says \"None.\" but also lists items")
-  split("Resolve before accepting|Carry into the plan", tn, "|")
+  split("Decide before building|Can wait for planning", tn, "|")
   if (!("Open questions" in seen)) report(1, "no \"## Open questions\" section")
   else for (i = 1; i <= 2; i++)
     if (!(i in tline)) report(seen["Open questions"], "Open questions has no \"### " tn[i] "\" heading")
@@ -169,13 +160,11 @@ END { endq(); end_r()
   s = status; n = 0
   while (match(s, /[0-9]+/)) { cnt[++n] = substr(s, RSTART, RLENGTH) + 0; s = substr(s, RSTART + RLENGTH) }
   if (!status_line) report(1, "no \"Status:\" line")
-  else if (n != 2) report(status_line, "Status: must give two numbers: questions to resolve before accepting, then to carry into the plan")
+  else if (n != 2) report(status_line, "Status: must give two numbers: questions to decide before building, then those that can wait for planning")
   else for (i = 1; i <= 2; i++) if (cnt[i] != n_tier[i] + 0)
     report(status_line, "Status: says " cnt[i] " under \"" tn[i] "\", but it lists " n_tier[i] + 0)
-  for (i = 1; i <= n_q; i++) if ((qref[i] in closed) && !(qref[i] in open_q))
-    report(qref_line[i], qref[i] " is closed in the Decision log; write its answer here instead of naming it, or cite it as (decided by <role>, " qref[i] ")")
-  for (i = 1; i <= n_m; i++) if ((mref[i] in open_q) && !(mref[i] in closed))
-    report(mref_line[i], mref[i] " is still open, so a (decided by …) marker cannot cite it")
+  for (i = 1; i <= n_m; i++) if (mref[i] in open_q)
+    report(mref_line[i], mref[i] " is an open question, so a (decided by …) marker cannot cite it")
   for (id in nound) if (!(id in held))
     report(nound[id], id " has no \"Until decided\" line, so name it where its case is left out, as in \"… waits for " id "\"")
   if (!n_out) report(1, "found no \"## Desired outcome\" items in the intent; check its headings")
