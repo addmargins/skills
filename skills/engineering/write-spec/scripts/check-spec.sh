@@ -5,6 +5,7 @@
 # - Outside the header, Sources, fenced blocks, URLs and the intent's quoted words, no file path or code name
 #   (camelCase, snake_case, or a backticked identifier) appears: non-engineers read that prose.
 # - Each requirement has a scenario; each constraint has Type:, Source: and Owner:, and no "Reason: not stated".
+#   A policy constraint cites no "(current behavior, …)": it states the clause, not what today's code does.
 # - No Roles or Conflicts line, constraint Owner:, or question's "Who answers" line says "not named" or
 #   "unnamed": each gives a role, by its responsibility.
 # - From the intent quotes each outcome and open question of the file on the "Intent:" line.
@@ -23,6 +24,8 @@
 # - A Sources line whose path names a policy file ends with a "Clauses:" record (step 3): each entry names a C, R or
 #   Q item or says "n/a", each Q it names is under "Decide before building", and, when the file can be found from
 #   the workspace root, every numbered clause in it ("2.3", "제4조", or a top-level "1.") is listed.
+#   An "n/a" entry does not only say that something stays as it is ("unchanged", "same", "as today", "변경 없음"):
+#   it says what the clause governs that this work does not do ("n/a: this work issues no refunds").
 # - Sources is the last section, and its list sits in the template's engineer appendix: a "<details><summary>"
 #   line first, its summary the template's word for word or, when the intent is not in English, a translation of
 #   all of it ("<who>: <what> (<who may skip>)"), then a blank line, the S lines, and "</details>".
@@ -125,6 +128,10 @@ function check_summary(l, s) {   # the summary of the Sources appendix
   else if (s !~ /(:|\357\274\232).+(\(|\357\274\210).+(\)|\357\274\211)[ \t]*$/ || english_share(s) > 0.5)
     report(l, "the Sources summary must translate all of the template'"'"'s: who it is for, what it lists, and, in parentheses, that other readers can skip it")
 }
+function stays_same(t) {   # an n/a reason that only says something stays as it is (English or Korean)
+  return tolower(t) ~ /(^|[^a-z])(unchanged|same|no changes?|not changed?|n.t changed?|as today|as before|as now|stays?|remains?|kept)([^a-z]|$)/ \
+    || t ~ /변경 ?없|변동 ?없|그대로|동일|현행|바뀌지 ?않|변하지 ?않|유지/
+}
 function end_r() { if (cr != "" && !scn) report(cr_line, cr " has no scenario: add a case under it"); cr = "" }
 
 /^```/ { fence = !fence; next }
@@ -145,6 +152,8 @@ sec != "" && sec != "Sources" { s = $0; if (/^- (Outcome|Question) "/) gsub(/"[^
   s = $0; while (match(s, /\(current behavior, [^)]*/)) { if (substr(s, RSTART, RLENGTH) !~ /, S[0-9]+/) report(FNR, "a (current behavior, …) marker must cite S<n> (Name) from Sources"); s = substr(s, RSTART + RLENGTH) } }
 sec == "Constraints" && /^- C[0-9]+\. / { for (k = split("Type:|Source:|Owner:", cf, "|"); k; k--) if (!index($0, cf[k])) report(FNR, "constraint has no \"" cf[k] "\"")
   if ($0 ~ /Reason:[ \t]*(not stated|none|n\/a|unknown)/) report(FNR, "omit Reason when the source states none")
+  if ($0 ~ /Type:[ \t]*(policy|정책)/ && index($0, "(current behavior")) report(FNR, "a policy constraint states what its clause requires, not what the code does: drop the (current behavior, …) marker; " \
+    "if the code follows one reading of the clause and its words allow another, ask its owner, as step 3 says")
   if (p = index($0, "Owner:")) no_role(FNR, substr($0, p)) }
 (sec == "Roles" || sec == "Conflicts") && /^- / { no_role(FNR, $0) }
 due && NF { due = 0
@@ -161,8 +170,11 @@ cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w 
   else if (tl[nf] == "Who answers") no_role(FNR, substr(s, p + w)) }
 sec == "Sources" && /^- S[0-9]+\. / { s = $0; sub(/^- /, "", s); id = s; sub(/\..*/, "", id)
   if (p = index($0, "Clauses:")) { cl_id[++ncl] = id; cl_line[ncl] = FNR; cl_rec[ncl] = substr($0, p + 8); cl_path[ncl] = first_path(substr($0, 1, p - 1))
-    n = split(cl_rec[ncl], a, ";"); for (k = 1; k <= n; k++) if (a[k] ~ /[^ \t.]/ && a[k] !~ /(^|[^A-Za-z0-9_])[RCQ][0-9]+/ && tolower(a[k]) !~ /n\/a/)
-      report(FNR, id " Clauses: \"" a[k] "\" names no C, R or Q item and does not say \"n/a: <why>\"") }
+    n = split(cl_rec[ncl], a, ";"); for (k = 1; k <= n; k++) { gsub(/^[ \t]+|[ \t.]+$/, "", a[k]); if (a[k] ~ /[^ \t.]/ && a[k] !~ /(^|[^A-Za-z0-9_])[RCQ][0-9]+/ && tolower(a[k]) !~ /n\/a/)
+      report(FNR, id " Clauses: \"" a[k] "\" names no C, R or Q item and does not say \"n/a: this work does not <what the clause governs>\"")
+      else if ((np = index(tolower(a[k]), "n/a")) && stays_same(substr(a[k], np + 3))) report(FNR, id " Clauses: \"" a[k] "\" says only that something stays as it is: " \
+        "write what the clause governs that this work does not do, as in \"n/a: this work issues no refunds\"; if this work pays, approves automatically, " \
+        "shows, sends, stores, deletes or shares what the clause governs, it applies even when its own numbers stay the same: it settles, reads two ways, or conflicts (step 3)") } }
   else if (tolower(first_path($0)) ~ /polic/) report(FNR, id " is a policy: end its line with the Clauses record the template shows, one entry per numbered clause") }
 sec == "Sources" && !src_open && !src_told && NF { if (/^<details><summary>.*<\/summary>[ \t]*$/) {
     src_open = FNR; s = $0; sub(/^<details><summary>/, "", s); sub(/<\/summary>[ \t]*$/, "", s); check_summary(FNR, s); next }

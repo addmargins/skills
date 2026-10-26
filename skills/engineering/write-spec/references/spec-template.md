@@ -62,6 +62,6 @@ Everything outside these questions is decided. Those under "Decide before buildi
 <details><summary>For engineers: where each cited fact was read (other readers can skip)</summary>
 
 - S1. <Plain name>: <optionally, a few plain words on what was read; then the file path, and the function, field, or lines read>.
-- S<n>. <Policy name>: <file path>. Clauses: <every numbered clause in order, one entry per clause or group, separated by semicolons: the C or R item it settles, as in "2.1, 2.2 C4"; "two readings" or "conflict" and its Q; or "n/a: <why>">.
+- S<n>. <Policy name>: <file path>. Clauses: <every numbered clause in order, one entry per clause or group, separated by semicolons: the C or R item it settles, as in "2.1, 2.2 C4"; "two readings" or "conflict" and its Q; or "n/a: this work does not <what the clause governs>", as in "n/a: this work issues no refunds">.
 
 </details>
