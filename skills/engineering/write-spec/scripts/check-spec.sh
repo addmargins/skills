@@ -32,7 +32,9 @@
 # - No "To resolve" line (or its translation) only says to choose a lettered answer or confirm the applicable rules.
 # - When an open question asks about a value at a boundary ("exactly", "equals", "at the threshold", "boundary",
 #   정확히, 경계), no line outside Open questions and Sources puts a case on one side of that value ("under £100",
-#   "100 or more", "within the threshold"), even one that names the question, unless the intent has those very words.
+#   "100 or more", "within the threshold", "exceeds £100", "a maximum of £100", "meets the threshold", "the lower
+#   side of the threshold", or "passes the … check" on a line naming the threshold), even one that names the
+#   question, unless the intent has those very words.
 # - Changes to existing behavior is present and says "None." exactly when it lists nothing.
 # - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id (R and C apart).
 # - Sources is the last section, and its list sits in the template's engineer appendix: a "<details><summary>"
@@ -71,14 +73,17 @@ function generic_resolve(v,   a, n, i, w) {   # 1 when a To resolve line only sa
 }
 function norm(v) { gsub(/,/, "", v); sub(/\.0+$/, "", v); return v }
 function side_scan(t, u,   m, v) {   # stores each phrase that puts a case on one side of a value
-  while (match(t, /(^|[^a-z])(under|below|over|above|within|less than|more than|at least|at most|up to|no more than)( (the|a|an|its) [a-z-]+( [a-z-]+)?( of)?)?[: ]+[^ 0-9a-z(]?[^ 0-9a-z(]?[^ 0-9a-z(]?[0-9][0-9,]*(\.[0-9]+)?/)) {
+  while (match(t, /(^|[^a-z])(under|below|over|above|within|less than|more than|at least|at most|up to|no more than|exceed(s|ed|ing)?|maximum of)( (the|a|an|its) [a-z-]+( [a-z-]+)?( of)?)?[: ]+[^ 0-9a-z(]?[^ 0-9a-z(]?[^ 0-9a-z(]?[0-9][0-9,]*(\.[0-9]+)?/)) {
     m = substr(t, RSTART, RLENGTH); t = substr(t, RSTART + RLENGTH); sub(/^[^a-z]/, "", m); sub(/,$/, "", m); v = m; sub(/^[^0-9]*/, "", v); side(m, norm(v)) }
   t = u
   while (match(t, /[0-9][0-9,]*(\.[0-9]+)?[^ 0-9]*[ ]?(or more|or less|or over|or under|이상|이하|미만|초과)/)) {
     m = substr(t, RSTART, RLENGTH); t = substr(t, RSTART + RLENGTH); v = m; sub(/[^0-9.,].*/, "", v); side(m, norm(v)) }
   t = u
-  while (match(t, /(^|[^a-z])(under|below|over|above|within|up to) (the|a|an|its) ([a-z-]+ )?(threshold|limit)/)) {
+  while (match(t, /(^|[^a-z])(under|below|over|above|within|up to|meets?|meeting|exceed(s|ed|ing)?|(lower|upper|higher|small|smaller|larger) side of) (the|a|an|its) ([a-z-]+ )?(threshold|limit)/)) {
     m = substr(t, RSTART, RLENGTH); t = substr(t, RSTART + RLENGTH); sub(/^[^a-z]/, "", m); v = m; sub(/.* /, "", v); side(m, "~" v) }
+  t = u   # "passes the auto-approval check" on a line that names the threshold
+  while (index(u, "threshold") && match(t, /(^|[^a-z])pass(es|ed|ing)? (the|a|an|its) ([a-z-]+ )?([a-z-]+ )?check/)) {
+    m = substr(t, RSTART, RLENGTH); t = substr(t, RSTART + RLENGTH); sub(/^[^a-z]/, "", m); side(m, "~threshold") }
 }
 function side(m, v) {   # skips the intent words, and "falls under a threshold" (splitting)
   if (!index(itx, m) && !index(cur, "fall " m) && !index(cur, "falls " m) && !index(cur, "falling " m)) { sd_m[++n_sd] = m; sd_v[n_sd] = v; sd_l[n_sd] = FNR } }

@@ -55,7 +55,7 @@ Everything outside these questions is decided. Those under "Decide before buildi
 <Each role's area question, then each leaving a case, a step, who qualifies, or a behavior open; else "None.">
 
 - Q1. <Short name>
-  - What is unclear: <one sentence, naming the case or slot left open; for a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require", with no clause number or quote.>
+  - What is unclear: <one sentence, naming the case or slot left open; for one item's parts: "1. <case>: <what changes for it>; 2. …", one case per part; for a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require", with no clause number or quote.>
   - Depends on the answer: <for each likely answer, which R or C items change and how; for areas: the requirements each area's Affects names.>
   - To resolve: <the concrete decision or check that settles it: what the decider fixes, such as "who receives the receipt after a refund", or the record to check, where, and why it was not checked here; for areas: the role names the rules governing each and confirms or corrects its quotes. Not just "choose a or b".>
   - Who answers: <the role, as under Roles; for an area, its role heading.>
