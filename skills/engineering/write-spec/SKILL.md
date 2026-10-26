@@ -83,13 +83,17 @@ Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>`. Fix what it
 
 ### 6. Check with a fresh reader
 
-You can't run the spec's test yourself, because you fill gaps from what you read without noticing. Give spec.md and the intent, and nothing else, to a fresh subagent, on a different model when one is available, with the text of [references/reader-prompt.md](references/reader-prompt.md) as its request. Sort each item it lists:
+You can't run the spec's test yourself, because you fill gaps from what you read without noticing. Once per draft, give spec.md and the intent, and nothing else, to one fresh subagent, on a different model when one is available, with this request:
+
+> You will build from this spec and can't ask anyone. List at most 10 findings, most important first, each with its R, C, or Q id: a choice you would make yourself that a user, a stakeholder, or another system would notice, with literal values and what each would see; a quoted sentence deciding something the intent does not, with no marker or named item behind it; or two quoted sentences that cannot both hold. An open question leaves off only the case it names. Leave out how to build it and failures nobody outside sees.
+
+Sort each finding:
 
 - **Settled but not written**: you can name the workspace file and line that settles it. Write it in with its marker. Your reading of a source is not a citation.
-- **Not a gap**: it follows from a requirement or constraint you can cite, whose words cover that very case, not a boundary you drew; or it can't happen given current behavior the spec states; or only the builders would notice. Drop it. A flagged sentence that only restates another item names that item or goes. Never delete a likely answer, a waiting case, or a question's meanwhile to answer a reader.
-- **A gap**: add an open question as step 3 says. Never fill it in yourself.
+- **Not a gap**: it follows from a requirement or constraint you can cite, whose words cover that very case, not a boundary you drew; or it can't happen given current behavior the spec states; or only the builders would notice. Drop it. A flagged sentence that only restates another item names that item or goes. Never delete a likely answer or a waiting case to answer a reader.
+- **A gap, a sentence that decides too much, or two that cannot both hold**: cut each sentence back to what its source settles, and ask the rest as step 3 says, in the tier it gives; two rules that cannot both hold are a conflict. Never fill a gap yourself, and never add a marker whose source does not settle the sentence just to answer a finding. When a finding says an open question stops more than its case, name that case where it waits; never hold back a whole requirement.
 
-Then run step 5 and this step once more, with a new reader. Stop after that second reader; sort what it lists the same way, and don't add requirements just to answer it. Last, re-read each line you changed after it against the test at the top: it decides nothing nobody decided and contradicts nothing decided or already told to an actor.
+Don't ask a second reader. Run step 5 again, then re-read each line you changed against the test at the top: it decides nothing nobody decided and contradicts nothing decided or already told to an actor.
 
 ### 7. Save
 

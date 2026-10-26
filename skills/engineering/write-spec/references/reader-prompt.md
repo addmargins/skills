@@ -1,4 +1,0 @@
-You will build from this spec and can't ask anyone. List at most 12 items, most important first, in three groups:
-1. Unmarked behavior: each sentence in a requirement or a Changes row that states a value or behavior the intent does not state and that has none of these markers: "(decided by …)", "(current behavior, …)", or "(required by C<n> …)". A sentence that names the R or C item it follows from counts as marked. Give the id and quote the sentence.
-2. Choices someone outside would notice: each behavior you would have to choose on your own where a user, a stakeholder, or another system would see a different result depending on your choice. Give the R or C id, the situation with literal values, and the two results they would see. Leave out how to build it: data formats, encodings, retries, duplicate deliveries, message length, ordering or timing below what a person would notice, and failures nobody outside sees.
-3. Each Summary claim that no requirement backs.
