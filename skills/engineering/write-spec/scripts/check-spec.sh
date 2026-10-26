@@ -1,13 +1,21 @@
 #!/bin/sh
 # check-spec.sh <spec.md>: check what a reader of spec.md alone cannot.
-# - Every R, C, Q and S id mentioned is defined once, and "R<n> (Name)", "C<n> (Name)" or "S<n> (Name)" uses its
-#   current name; S ids are defined under Sources, and "(current behavior, …)" cites one.
+# - Every R, A, C, Q and S id mentioned is defined once, and "R<n> (Name)", "A<n> (Name)", "C<n> (Name)" or
+#   "S<n> (Name)" uses its current name; S ids are defined under Sources, and "(current behavior, …)" cites one.
 # - Outside the header, Sources, fenced blocks, URLs and the intent's quoted words, no file path or code name
 #   (camelCase, snake_case, or a backticked identifier) appears: non-engineers read that prose.
-# - Each requirement has a scenario; each constraint has Type:, Source: and Owner:, and no "Reason: not stated".
-#   A policy constraint cites no "(current behavior, …)": it states the clause, not what today's code does.
-# - No Roles or Conflicts line, constraint Owner:, or question's "Who answers" line says "not named" or
-#   "unnamed": each gives a role, by its responsibility.
+# - Each requirement has a scenario; each constraint has Type:, Source: and Owner:, no "Reason: not stated", and
+#   is not of Type policy or law: those go under What this work touches.
+# - No Roles line, role heading under What this work touches, constraint Owner:, or question's "Who answers" line
+#   says "not named" or "unnamed": each gives a role, by its responsibility.
+# - Under What this work touches, each A item sits under a "### <role>" heading and has the template's lines:
+#   Today:, After:, Affects: naming an R, one or more Policy text: lines, and Confirm in: naming a Q that is under
+#   "Decide before building" and whose "Who answers" names the item's role (its words before any "," or "(").
+#   A Policy text: line either cites the document as S<n> and quotes its clause in double quotes, word for word
+#   (checked, after whitespace is collapsed, against the S line's file when it can be found from the workspace
+#   root), or is "No policy document for this area found in the workspace." (in a spec not in English, a
+#   translation of it: no quote, S id, digit or "n/a", and not mostly that sentence's English words). When the
+#   intent is not in English, the section's note is not the template's English one.
 # - From the intent quotes each outcome and open question of the file on the "Intent:" line.
 # - Open questions starts with the template's note word for word, or with a translation of it (a paragraph
 #   that is not mostly the note's English words and names the labels the note quotes, as the questions do).
@@ -21,11 +29,6 @@
 # - No "(decided by …)" marker cites an open question.
 # - Changes to existing behavior is present and says "None." exactly when it lists nothing.
 # - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id (R and C apart).
-# - A Sources line whose path names a policy file ends with a "Clauses:" record (step 3): each entry names a C, R or
-#   Q item or says "n/a", each Q it names is under "Decide before building", and, when the file can be found from
-#   the workspace root, every numbered clause in it ("2.3", "제4조", or a top-level "1.") is listed.
-#   An "n/a" entry does not only say that something stays as it is ("unchanged", "same", "as today", "변경 없음"):
-#   it says what the clause governs that this work does not do ("n/a: this work issues no refunds").
 # - Sources is the last section, and its list sits in the template's engineer appendix: a "<details><summary>"
 #   line first, its summary the template's word for word or, when the intent is not in English, a translation of
 #   all of it ("<who>: <what> (<who may skip>)"), then a blank line, the S lines, and "</details>".
@@ -48,11 +51,11 @@ letters() { LC_ALL=C sed -e '/^#/d' -e 's/`[^`]*`//g' "$intent" | LC_ALL=C tr -c
 foreign=$(letters '\316-\333\343-\355') latin=$(letters 'A-Za-z')
 foreign=$(( foreign * 10 > (foreign + latin) * 3 ))   # 1 when the intent is not in English
 
-awk -v SPEC="$spec" -v FOREIGN="$foreign" -v ROOTS="$dir/../..|$dir/..|$dir|." '
+awk -v SPEC="$spec" -v FOREIGN="$foreign" -v NOTFOUND="No policy document for this area found in the workspace." -v ROOTS="$dir/../..|$dir/..|$dir|." '
 function report(l, m) { print SPEC ":" l ": " m; bad = 1 }
-function english_share(t,   a, n, i, w, hit) {   # share of the words of t that are words of the template note
-  if (!n_ew) { w = tolower(note); gsub(/[^a-z]+/, " ", w); n_ew = split(w, a, " "); for (i = 1; i <= n_ew; i++) ew[a[i]] = 1 }
-  n = split(t, a, " "); for (i = 1; i <= n; i++) { w = a[i]; gsub(/[.,;:!?"()]/, "", w); hit += w ~ /^[A-Za-z]+$/ && (tolower(w) in ew) }
+function english_share(t, ref,   a, n, i, w, hit) {   # share of the words of t that are English words of ref
+  if (!(ref in ew_done)) { ew_done[ref] = 1; w = tolower(ref); gsub(/[^a-z]+/, " ", w); n = split(w, a, " "); for (i = 1; i <= n; i++) ew[ref, a[i]] = 1 }
+  n = split(t, a, " "); for (i = 1; i <= n; i++) { w = a[i]; gsub(/[.,;:!?"()]/, "", w); hit += w ~ /^[A-Za-z]+$/ && ((ref, tolower(w)) in ew) }
   return n ? hit / n : 0
 }
 function endq(   k, want) {   # checks the labeled lines of the open question just read
@@ -61,22 +64,24 @@ function endq(   k, want) {   # checks the labeled lines of the open question ju
   else for (k = 1; k <= nf; k++) {
     if (!eng && !(k in fl)) { fl[k] = lab[k]; if (tr != "" && index(note, "\"" tl[k] "\"") && !index(tr, lab[k]))
       report(cq_line, "the Open questions note does not name \"" lab[k] "\", the label " cq " uses for \"" tl[k] "\"")
-      if (FOREIGN && lab[k] == tl[k]) report(cq_line, "\"" tl[k] "\" is the English label, but the intent is not in English: translate it, as step 4 says") }
+      if (FOREIGN && lab[k] == tl[k]) report(cq_line, "\"" tl[k] "\" is the English label, but the intent is not in English: translate it, as step 5 says") }
     want = eng ? tl[k] : fl[k]
     if (lab[k] != want) { report(cq_line, cq ": line " k " is labeled \"" lab[k] "\"; expected \"" want "\""); break }
   }
   cq = ""
 }
-function is_def(   s) {   # sets ID and NM when this line defines an R, C, Q or S
-  if ($0 !~ /^### R[0-9]+\. / && $0 !~ /^- [CQ][0-9]+\. / && !(sec == "Sources" && $0 ~ /^- S[0-9]+\. /)) return 0
+function is_def(   s) {   # sets ID and NM when this line defines an R, A, C, Q or S
+  if ($0 !~ /^### R[0-9]+\. / && $0 !~ /^- [CQ][0-9]+\. / && !(sec == "Sources" && $0 ~ /^- S[0-9]+\. /) \
+    && !(sec == "What this work touches" && $0 ~ /^- A[0-9]+\. /)) return 0
   s = $0; sub(/^(### |- )/, "", s); ID = s; sub(/\..*/, "", ID); NM = s
-  sub(/^R[0-9]+\. ([^:]*: )?/, "", NM); if (ID ~ /^[CS]/) { sub(/^[CS][0-9]+\. /, "", NM); sub(/:.*/, "", NM) }
+  sub(/^[RA][0-9]+\. ([^:]*: )?/, "", NM); sub(/[ \t]+$/, "", NM); if (ID ~ /^[CS]/) { sub(/^[CS][0-9]+\. /, "", NM); sub(/:.*/, "", NM) }
   if (ID ~ /^Q/) NM = ""
   return 1
 }
 { sub(/\r$/, "") }
 FNR == 1 { for (f = 1; f < ARGC && ARGV[f] != FILENAME; f++) ; }
 f == 1 { if (/^## /) { tsec = $0; next }
+         if (tsec == "## What this work touches" && anote == "" && NF && !/^[<#-]/) anote = $0
          if (tsec == "## Sources" && /^<details><summary>.*<\/summary>[ \t]*$/) { tsum = $0; sub(/^<details><summary>/, "", tsum); sub(/<\/summary>[ \t]*$/, "", tsum) }
          if (tsec != "## Open questions" || !NF || /^</ || /^#/ || tdone) next
          if (/^- /) { if (inq) { tdone = 1; next } inq = 1 }
@@ -104,39 +109,40 @@ function first_path(t,   a, n, i, w) {   # the first file path in t, or ""
   for (i = 1; i <= n; i++) { w = a[i]; gsub(/^[(`"]+|[.,;:)`"]+$/, "", w); if (w ~ /\// || w ~ /\.md$/) return w }
   return ""
 }
-function listed(r, L,   i, n, b, a) {   # whether clause number L appears in r as a whole number
-  n = length(L)
-  while ((i = index(r, L)) > 0) { b = i > 1 ? substr(r, i - 1, 1) : ""; a = substr(r, i + n, 2)
-    if (b !~ /[A-Za-z0-9.]/ && a !~ /^[0-9]/ && a !~ /^\.[0-9]/) return 1
-    r = substr(r, i + n) }
-  return 0
-}
-function read_clauses(f,   l, t, na, nk, nn, A, K, N, i) {   # sets LB[1..NL] to the numbered clauses of file f
-  na = nk = nn = NL = 0
-  while ((getline l < f) > 0) { sub(/\r$/, "", l)
-    if (match(l, /^[ \t>*-]*[0-9]+\.[0-9]+(\.[0-9]+)*[ \t.)*]/)) { t = substr(l, RSTART, RLENGTH); gsub(/^[ \t>*-]+|[ \t.)*]+$/, "", t); A[++na] = t }
-    else if (l ~ /^#/ && match(l, /제[0-9]+조/)) K[++nk] = substr(l, RSTART, RLENGTH)
-    else if (match(l, /^(\*\*)?[0-9]+\.(\*\*)?[ \t]/)) { t = substr(l, RSTART, RLENGTH); gsub(/[^0-9]/, "", t); N[++nn] = t } }
-  close(f)
-  if (na) for (i = 1; i <= na; i++) LB[++NL] = A[i]
-  else if (nk) for (i = 1; i <= nk; i++) LB[++NL] = K[i]
-  else for (i = 1; i <= nn; i++) LB[++NL] = N[i]
-}
 function check_summary(l, s) {   # the summary of the Sources appendix
-  if (s == tsum) { if (FOREIGN) report(l, "the intent is not in English: translate the Sources summary, as step 4 says"); return }
+  if (s == tsum) { if (FOREIGN) report(l, "the intent is not in English: translate the Sources summary, as step 5 says"); return }
   if (!FOREIGN) report(l, "the Sources summary must be the template'"'"'s, word for word: \"" tsum "\"")
-  else if (s !~ /(:|\357\274\232).+(\(|\357\274\210).+(\)|\357\274\211)[ \t]*$/ || english_share(s) > 0.5)
+  else if (s !~ /(:|\357\274\232).+(\(|\357\274\210).+(\)|\357\274\211)[ \t]*$/ || english_share(s, note) > 0.5)
     report(l, "the Sources summary must translate all of the template'"'"'s: who it is for, what it lists, and, in parentheses, that other readers can skip it")
 }
-function stays_same(t) {   # an n/a reason that only says something stays as it is (English or Korean)
-  return tolower(t) ~ /(^|[^a-z])(unchanged|same|no changes?|not changed?|n.t changed?|as today|as before|as now|stays?|remains?|kept)([^a-z]|$)/ \
-    || t ~ /변경 ?없|변동 ?없|그대로|동일|현행|바뀌지 ?않|변하지 ?않|유지/
+function squeeze(t) { gsub(/[ \t\r\n]+/, " ", t); gsub(/\*\*/, "", t); sub(/^ /, "", t); sub(/ $/, "", t); return t }
+function file_text(f,   l, t) { if (f in ftext) return ftext[f]; t = ""; while ((getline l < f) > 0) t = t " " l; close(f); return ftext[f] = squeeze(t) }
+function find_file(path,   a, k, f, l) {   # path found from the workspace root, or ""
+  if (path == "") return ""
+  if (path ~ /^\//) return ((getline l < path) > 0) ? path : ""
+  f = ""; for (k = split(ROOTS, a, "|"); k; k--) if ((getline l < (a[k] "/" path)) > 0) { close(a[k] "/" path); f = a[k] "/" path }
+  return f
+}
+function check_policy_text(l, id, v,   t, i, j, q, sid, f) {   # one "Policy text:" line of area id
+  t = v; gsub(/\342\200\234|\342\200\235/, "\"", t)
+  if ((i = index(t, "\"")) > 0) { q = substr(t, i + 1); j = 0; while (match(substr(q, j + 1), /"/)) j += RSTART
+    if (!j) { report(l, id ": the quoted clause has no closing quote mark"); return }
+    q = squeeze(substr(q, 1, j - 1)); sid = ""
+    if (match(substr(t, 1, i - 1), /(^|[^A-Za-z0-9_])S[0-9]+/)) { sid = substr(t, RSTART, RLENGTH); sub(/^[^S]/, "", sid) }
+    if (sid == "") { report(l, id ": cite the document the clause is quoted from as S<n> (Name), listed under Sources with its file"); return }
+    if ((f = find_file(s_path[sid])) != "" && !index(file_text(f), q))
+      report(l, id ": the text quoted from " sid " is not word for word in " s_path[sid] ": quote the clause exactly, never a summary")
+    return }
+  if (tolower(t) ~ /^no policy document for this area found in the workspace/) {
+    if (FOREIGN) report(l, id ": the intent is not in English: translate \"" NOTFOUND "\" into its language"); return }
+  if (!FOREIGN || t ~ /[0-9]/ || t ~ /(^|[^A-Za-z0-9_])S[0-9]+/ || tolower(t) ~ /n\/a|not appl|no polic(y|ies) appl|해당 ?없|적용(되지 ?않|하지 ?않|대상 ?아)/ || english_share(t, NOTFOUND) > 0.5)
+    report(l, id ": a Policy text: line quotes a clause, with its S<n> and in quote marks, or says \"" NOTFOUND "\"" (FOREIGN ? " in the intent'"'"'s language" : "") ", never that none applies")
 }
 function end_r() { if (cr != "" && !scn) report(cr_line, cr " has no scenario: add a case under it"); cr = "" }
 
 /^```/ { fence = !fence; next }
 fence { next }
-/^## / { endq(); end_r(); if (sec == "Sources") report(FNR, "\"" $0 "\" comes after Sources: keep Sources the last section")
+/^## / { endq(); end_r(); ca = role = ""; if (sec == "Sources") report(FNR, "\"" $0 "\" comes after Sources: keep Sources the last section")
   sec = substr($0, 4); seen[sec] = FNR; due = (sec == "Open questions"); next }
 sec == "Open questions" && /^### / { endq(); s = substr($0, 5); sub(/[ \t]+$/, "", s)
   if (due) report(FNR, "Open questions must start with the template'"'"'s note, word for word, or its faithful translation"); due = 0
@@ -147,35 +153,39 @@ sec == "Open questions" && /^### / { endq(); s = substr($0, 5); sub(/[ \t]+$/, "
 sec == "Open questions" && tier && /^- / { titems[tier]++ }
 sec == "Open questions" && tier && /^None\.[ \t]*$/ { tnone[tier] = FNR }
 sec == "Requirements" && /^- / { scn = 1 }
-sec != "" && sec != "Sources" { s = $0; if (/^- (Outcome|Question) "/) gsub(/"[^"]*"/, "", s)
+sec != "" && sec != "Sources" { s = $0; if (/^- (Outcome|Question) "/) gsub(/"[^"]*"/, "", s); if (/^[ \t]+- Policy text:/) sub(/".*/, "", s)
   if ((w = code_name(s)) != "") report(FNR, "\"" w "\" is a file or code name: say it in plain words and cite S<n> (Name); names go under Sources")
   s = $0; while (match(s, /\(current behavior, [^)]*/)) { if (substr(s, RSTART, RLENGTH) !~ /, S[0-9]+/) report(FNR, "a (current behavior, …) marker must cite S<n> (Name) from Sources"); s = substr(s, RSTART + RLENGTH) } }
 sec == "Constraints" && /^- C[0-9]+\. / { for (k = split("Type:|Source:|Owner:", cf, "|"); k; k--) if (!index($0, cf[k])) report(FNR, "constraint has no \"" cf[k] "\"")
   if ($0 ~ /Reason:[ \t]*(not stated|none|n\/a|unknown)/) report(FNR, "omit Reason when the source states none")
-  if ($0 ~ /Type:[ \t]*(policy|정책)/ && index($0, "(current behavior")) report(FNR, "a policy constraint states what its clause requires, not what the code does: drop the (current behavior, …) marker; " \
-    "if the code follows one reading of the clause and its words allow another, ask its owner, as step 3 says")
+  if (tolower($0) ~ /type:[ \t]*(policy|law|legal|regulation|정책|법)/) report(FNR, "a policy or law is not a constraint: put the area it governs under What this work touches, " \
+    "quoting the clause, for its role to confirm (step 3)")
   if (p = index($0, "Owner:")) no_role(FNR, substr($0, p)) }
-(sec == "Roles" || sec == "Conflicts") && /^- / { no_role(FNR, $0) }
+sec == "Roles" && /^- / { no_role(FNR, $0) }
+sec == "What this work touches" && !role && !ca && NF && !/^[#-]/ && FOREIGN && $0 == anote {
+  report(FNR, "the intent is not in English: translate the What this work touches note, as step 5 says") }
+sec == "What this work touches" && /^### / { role = substr($0, 5); sub(/[ \t]+$/, "", role); no_role(FNR, role); ca = ""; next }
+sec == "What this work touches" && /^- A[0-9]+\. / { ca = substr($0, 3); sub(/\..*/, "", ca); a_id[++n_a] = ca; a_line[ca] = FNR; a_role[ca] = role }
+sec == "What this work touches" && /^- / && !/^- A[0-9]+\. / { ca = "" }
+sec == "What this work touches" && ca != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); k = p ? substr(s, 1, p - 1) : ""; v = substr(s, p + 1); sub(/^[ \t]+/, "", v)
+  if (k !~ /^(Today|After|Affects|Policy text|Confirm in)$/) { report(FNR, ca " has a line labeled \"" k "\": use the template'"'"'s Today:, After:, Affects:, Policy text: and Confirm in:"); next }
+  a_has[ca, k]++; if (v ~ /^[ \t]*$/) report(FNR, ca " has an empty \"" k "\" line")
+  if (k == "Affects" && v !~ /(^|[^A-Za-z0-9_])R[0-9]+/) report(FNR, ca "'"'"'s Affects: names no requirement: give each R<n> (Short name) the area changes")
+  if (k == "Confirm in") { a_q[ca] = ""; if (match(v, /(^|[^A-Za-z0-9_])Q[0-9]+/)) { a_q[ca] = substr(v, RSTART, RLENGTH); sub(/^[^Q]/, "", a_q[ca]) } a_qline[ca] = FNR }
+  if (k == "Policy text") { pt_a[++n_pt] = ca; pt_line[n_pt] = FNR; pt_v[n_pt] = v } }
 due && NF { due = 0
   if ($0 == note) { eng = 1
     if (FOREIGN) report(FNR, "the intent is not in English: translate the Open questions note and the question labels into its language")
     next }
-  if ($0 !~ /^(- |[ \t]|None\.)/ && english_share($0) <= 0.5) { tr = $0; next }
+  if ($0 !~ /^(- |[ \t]|None\.)/ && english_share($0, note) <= 0.5) { tr = $0; next }
   report(FNR, "Open questions must start with the template'"'"'s note, word for word, or its faithful translation") }
 cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w = index(s, "\357\274\232")   # ASCII or full-width colon
   if (w && (!p || w < p)) { p = w; w = 3 } else w = 1
   lab[++nf] = p ? substr(s, 1, p - 1) : ""
   if (!p) report(FNR, cq " has a line with no label: start it with the label and a colon, as in the template")
   else if (substr(s, p + w) ~ /^[ \t]*$/) report(FNR, cq " has an empty \"" lab[nf] "\" line")
-  else if (tl[nf] == "Who answers") no_role(FNR, substr(s, p + w)) }
-sec == "Sources" && /^- S[0-9]+\. / { s = $0; sub(/^- /, "", s); id = s; sub(/\..*/, "", id)
-  if (p = index($0, "Clauses:")) { cl_id[++ncl] = id; cl_line[ncl] = FNR; cl_rec[ncl] = substr($0, p + 8); cl_path[ncl] = first_path(substr($0, 1, p - 1))
-    n = split(cl_rec[ncl], a, ";"); for (k = 1; k <= n; k++) { gsub(/^[ \t]+|[ \t.]+$/, "", a[k]); if (a[k] ~ /[^ \t.]/ && a[k] !~ /(^|[^A-Za-z0-9_])[RCQ][0-9]+/ && tolower(a[k]) !~ /n\/a/)
-      report(FNR, id " Clauses: \"" a[k] "\" names no C, R or Q item and does not say \"n/a: this work does not <what the clause governs>\"")
-      else if ((np = index(tolower(a[k]), "n/a")) && stays_same(substr(a[k], np + 3))) report(FNR, id " Clauses: \"" a[k] "\" says only that something stays as it is: " \
-        "write what the clause governs that this work does not do, as in \"n/a: this work issues no refunds\"; if this work pays, approves automatically, " \
-        "shows, sends, stores, deletes or shares what the clause governs, it applies even when its own numbers stay the same: it settles, reads two ways, or conflicts (step 3)") } }
-  else if (tolower(first_path($0)) ~ /polic/) report(FNR, id " is a policy: end its line with the Clauses record the template shows, one entry per numbered clause") }
+  else if (tl[nf] == "Who answers") { no_role(FNR, substr(s, p + w)); qwho[cq] = substr(s, p + w) } }
+sec == "Sources" && /^- S[0-9]+\. / { s = $0; sub(/^- /, "", s); id = s; sub(/\..*/, "", id); s_path[id] = first_path(s) }
 sec == "Sources" && !src_open && !src_told && NF { if (/^<details><summary>.*<\/summary>[ \t]*$/) {
     src_open = FNR; s = $0; sub(/^<details><summary>/, "", s); sub(/<\/summary>[ \t]*$/, "", s); check_summary(FNR, s); next }
   report(FNR, "Sources must start with the template'"'"'s line \"<details><summary>" tsum "</summary>\" (translated in a spec not in English), then a blank line, the S lines, and \"</details>\": the list is an appendix for engineers"); src_told = 1 }
@@ -191,8 +201,8 @@ is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; l
   if (ID ~ /^Q/) open_q[ID] = 1
   if (sec == "Open questions" && ID ~ /^Q/) { endq(); cq = ID; cq_line = FNR; nf = 0; n_tier[tier]++; qtier[ID] = tier
     if (!tier) report(FNR, ID " is under no tier: put it under \"### Decide before building\" or \"### Can wait for planning\"") } }
-{ s = " " $0
-  while (match(s, /[^A-Za-z0-9_][RCQS][0-9]+/)) {
+{ s = " " $0; if (/^[ \t]+- Policy text:/) sub(/".*/, "", s)
+  while (match(s, /[^A-Za-z0-9_][RACQS][0-9]+/)) {
     id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
     if (s ~ /^[A-Za-z0-9_]/) continue
     ref[++n_ref] = id; ref_line[n_ref] = FNR; ref_nm[n_ref] = ""
@@ -232,15 +242,16 @@ END { endq(); end_r()
   if (!n_out) report(1, "found no \"## Desired outcome\" items in the intent; check its headings")
   for (i = 1; i <= n_want; i++) if (!index(ledger, "\n" want[i]))
     report(1, "From the intent: no Outcome or Question line quoting \"" want[i] "\"")
-  for (i = 1; i <= ncl; i++) { s = " " cl_rec[i]
-    while (match(s, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
-      if (s !~ /^[0-9]/ && (id in qtier) && qtier[id] != 1) report(cl_line[i], cl_id[i] " Clauses: " id " is a clause'"'"'s reading or conflict, so it goes under \"Decide before building\"") }
-    f = ""; if (cl_path[i] ~ /^\//) f = cl_path[i]
-    else if (cl_path[i] != "") for (k = split(ROOTS, a, "|"); k; k--) if ((getline s < (a[k] "/" cl_path[i])) > 0) { close(a[k] "/" cl_path[i]); f = a[k] "/" cl_path[i] }
-    if (f == "") continue
-    split("", LB); read_clauses(f); m = ""; split("", told_cl)
-    for (k = 1; k <= NL; k++) if (!(LB[k] in told_cl) && !listed(cl_rec[i], LB[k])) { m = m (m == "" ? "" : ", ") LB[k]; told_cl[LB[k]] = 1 }
-    if (m != "") report(cl_line[i], cl_id[i] " Clauses: does not list " m " of " cl_path[i] ": record every numbered clause, as step 3 says") }
+  for (i = 1; i <= n_a; i++) { id = a_id[i]
+    if (a_role[id] == "") report(a_line[id], id " is under no role heading: put it under \"### <the role that confirms its rules>\", as in the template")
+    for (k = split("Today|After|Affects|Policy text|Confirm in", cf, "|"); k; k--) if (!((id, cf[k]) in a_has)) report(a_line[id], id " has no \"" cf[k] ":\" line")
+    q = a_q[id]; if (!((id, "Confirm in") in a_has)) continue
+    if (q == "") report(a_qline[id], id "'"'"'s Confirm in: names no question: give the Q<n> that asks its role to confirm it")
+    else if (!(q in qtier)) continue
+    else if (qtier[q] != 1) report(a_qline[id], id " is confirmed in " q ", which is not under \"Decide before building\": an area'"'"'s question is answered before building starts")
+    else if (a_role[id] != "") { r = tolower(a_role[id]); sub(/[,(\357].*/, "", r); sub(/[ \t]+$/, "", r)
+      if (!index(tolower(qwho[q]), r)) report(a_qline[id], q "'"'"'s Who answers does not name " id "'"'"'s role, \"" a_role[id] "\": the role under which an area sits answers its question") } }
+  for (i = 1; i <= n_pt; i++) check_policy_text(pt_line[i], pt_a[i], pt_v[i])
   for (id in name) if (id ~ /^[RC]/ && ((k = substr(id, 1, 1) SUBSEP name[id]) in old) && old[k] != id)
     report(line[id], id " has the name of " old[k] " in the superseded spec; keep the old id")
   exit bad

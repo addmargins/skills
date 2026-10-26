@@ -2,20 +2,19 @@
 
 Intent: <file name of the accepted intent>
 
-Supersedes: <earlier spec file name, only when this spec supersedes one>
+Supersedes: <earlier spec file name, only when superseding one>
 
 Status: <number> to decide before building, <number> that can wait for planning.
 
 ## Summary
-<Two or three plain sentences: the problem, who it is for, and what they will see or do, each backed by a requirement.>
+<Two or three plain sentences: the problem, for whom, and what they will see or do, each backed by a requirement.>
 
 ## Roles
-<Roles, never people, each by its responsibility: what it decides or confirms.>
+<Roles by responsibility, never people: what each decides or confirms.>
 - Originator (<their role, from the intent>): <the problem is solved; From the intent>.
-- Owner of <policy> (<the office or role it names>): <its C items and conflicts>.
-- Engineers for <systems>: <the work can be planned without deciding product behavior>.
+- <Role confirming an area's rules>: <its A items>.
 - Technical lead for <system>: <design constraints and the facts they rest on>.
-- Product owner for <product>, or whoever decides its behavior: <scope, and product behavior no other role decides>.
+- Product owner for <product>, or whoever decides its behavior: <scope, and behavior no other role decides>.
 - <Any other role a question goes to>: <what it decides>.
 
 ## Requirements
@@ -23,19 +22,27 @@ Status: <number> to decide before building, <number> that can wait for planning.
 <"Must" sentences: what the actor or another system observes.>
 
 - Given <situation, with actual values>, when <action>, then <what is seen or returned, with actual values>.
-- <Another case only when its result does not follow from the rule above, or one at the exact value of each threshold the rule names, with the result on each side.>
+- <Another case only when its result does not follow from the rule above, or at the exact value of each threshold, with the result on each side.>
 
 ## Changes to existing behavior
-- Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, data, or integrations>. Can be undone: <yes, or what stays done, such as money paid or texts sent>.
+- Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, data, or integrations>. Can be undone: <yes, or what stays done, such as money paid>.
+
+## What this work touches
+Policies or laws commonly govern each area below that this work changes. The role named confirms which apply and what they require. A quoted clause is a lead, not this spec's reading; rules kept elsewhere may govern any area.
+
+### <Role that confirms the rules for these areas>
+- A1. <Area, in plain words, such as "Bank details kept for payouts">
+  - Today: <what happens now, with its marker, or "nothing">.
+  - After: <what happens once built>.
+  - Affects: <R<n> (Short name), …>.
+  - Policy text: <document> (S<n>), <clause number>: "<the clause, word for word>". <One line per clause; with none in the workspace: No policy document for this area found in the workspace.>
+  - Confirm in: Q<n>.
 
 ## Constraints
-- C1. <Short name>: <the rule in one checkable sentence, citing rather than restating its source>. Type: <policy, or limit (of a system or contract, or set by the intent)>. Source: <document title and section, or the deciding role; for a limit, "verified in S<n> (Plain name)" or "claimed in S<n> (Plain name), not verified">. Owner: <the role that interprets or waives it>. Reason: <only as the source states one; omit the field when it states none>.
-
-## Conflicts
-- <Any two R or C items, by id and name: the case, with actual values, where both cannot hold.> <Agreed by <the role owning each rule that gives way>, <where>, <date>: <which wins, or the exception> | Unresolved: see Q<n>.>
+- C1. <Short name>: <the limit in one checkable sentence>. Type: limit (<of a system or contract, or set by the intent>). Source: <"verified in S<n> (Plain name)", "claimed in S<n> (Plain name), not verified", or the intent>. Owner: <the role that can change it>. Reason: <only as the source states one, else omit>.
 
 ## Out of scope
-- <What a reader might expect covered that is not, and why if a reason was given.>
+- <What a reader might expect covered that is not, and any reason given.>
 
 ## From the intent
 - Outcome "<desired outcome, quoted>": <R<n> (Short name), …>. <Each vague word in it: "<word>" means <value>, with its marker.>
@@ -45,23 +52,22 @@ Status: <number> to decide before building, <number> that can wait for planning.
 Everything outside these questions is decided. Those under "Decide before building" leave open a case, a step, or who qualifies, so they are answered before building starts. Those under "Can wait for planning" only fill a value, a wording, a label, or a format, which the plan leaves blank and fills before release. The role under "Who answers" decides; anyone may settle a fact by checking.
 
 ### Decide before building
-<Conflicts, policy readings, and every question that leaves a case, a step, who qualifies, or a behavior open; else "None.">
+<Each area's question, then each leaving a case, a step, who qualifies, or a behavior open; else "None.">
 
 - Q1. <Short name>
-  - What is unclear: <one sentence, naming the case or the slot it leaves open.>
-  - Depends on the answer: <for each likely answer, which R or C items change and how.>
-  - To resolve: <the decision to make, or the fact to check and why it could not be checked yet.>
-  - Who answers: <the role, as under Roles; when more than one, what each decides or confirms.>
+  - What is unclear: <one sentence, naming the case or slot left open; for an area, which policies or laws apply and what they require.>
+  - Depends on the answer: <for each likely answer, which R or C items change and how; for an area, its R items.>
+  - To resolve: <the decision to make, or the fact to check and why it was not checked.>
+  - Who answers: <the role, as under Roles; for an area, its role heading.>
 
 ### Can wait for planning
-<Questions that only fill a slot: a value, a wording, a label, or a format; else "None.">
+<Questions that only fill a value, a wording, a label, or a format; else "None.">
 
 - Q<n>. <Short name, then the lines above>
 
 ## Sources
 <details><summary>For engineers: where each cited fact was read (other readers can skip)</summary>
 
-- S1. <Plain name>: <optionally, a few plain words on what was read; then the file path, and the function, field, or lines read>.
-- S<n>. <Policy name>: <file path>. Clauses: <every numbered clause in order, one entry per clause or group, separated by semicolons: the C or R item it settles, as in "2.1, 2.2 C4"; "two readings" or "conflict" and its Q; or "n/a: this work does not <what the clause governs>", as in "n/a: this work issues no refunds">.
+- S1. <Plain name>: <optionally, plain words on what was read; then the file path, and the function, field, or lines read>.
 
 </details>
