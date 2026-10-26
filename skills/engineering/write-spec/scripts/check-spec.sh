@@ -20,6 +20,9 @@
 # - No "(decided by …)" marker cites an open question.
 # - Changes to existing behavior is present and says "None." exactly when it lists nothing.
 # - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id (R and C apart).
+# - A Sources line whose path names a policy file ends with a "Clauses:" record (step 3): each entry names a C, R or
+#   Q item or says "n/a", each Q it names is under "Decide before building", and, when the file can be found from
+#   the workspace root, every numbered clause in it ("2.3", "제4조", or a top-level "1.") is listed.
 # Prints "file:line: problem" per finding. Exits 0 when clean, 1 on findings, 2 on a usage error.
 set -eu
 spec=${1:?usage: check-spec.sh <spec.md>}
@@ -39,7 +42,7 @@ letters() { LC_ALL=C sed -e '/^#/d' -e 's/`[^`]*`//g' "$intent" | LC_ALL=C tr -c
 foreign=$(letters '\316-\333\343-\355') latin=$(letters 'A-Za-z')
 foreign=$(( foreign * 10 > (foreign + latin) * 3 ))   # 1 when the intent is not in English
 
-awk -v SPEC="$spec" -v FOREIGN="$foreign" '
+awk -v SPEC="$spec" -v FOREIGN="$foreign" -v ROOTS="$dir/../..|$dir/..|$dir|." '
 function report(l, m) { print SPEC ":" l ": " m; bad = 1 }
 function english_share(t,   a, n, i, w, hit) {   # share of the words of t that are words of the template note
   if (!n_ew) { w = tolower(note); gsub(/[^a-z]+/, " ", w); n_ew = split(w, a, " "); for (i = 1; i <= n_ew; i++) ew[a[i]] = 1 }
@@ -89,6 +92,29 @@ function code_name(t,   a, n, i, w) {   # the first file path or code name in t,
 }
 function no_role(l, t) { if (tolower(t) ~ /not named|unnamed/)
   report(l, "\"not named\" is not a role: name the role by its responsibility, such as \"owner of <policy>\" or \"whoever decides <product>'"'"'s behavior\"") }
+function first_path(t,   a, n, i, w) {   # the first file path in t, or ""
+  n = split(t, a, /[ \t]+/)
+  for (i = 1; i <= n; i++) { w = a[i]; gsub(/^[(`"]+|[.,;:)`"]+$/, "", w); if (w ~ /\// || w ~ /\.md$/) return w }
+  return ""
+}
+function listed(r, L,   i, n, b, a) {   # whether clause number L appears in r as a whole number
+  n = length(L)
+  while ((i = index(r, L)) > 0) { b = i > 1 ? substr(r, i - 1, 1) : ""; a = substr(r, i + n, 2)
+    if (b !~ /[A-Za-z0-9.]/ && a !~ /^[0-9]/ && a !~ /^\.[0-9]/) return 1
+    r = substr(r, i + n) }
+  return 0
+}
+function read_clauses(f,   l, t, na, nk, nn, A, K, N, i) {   # sets LB[1..NL] to the numbered clauses of file f
+  na = nk = nn = NL = 0
+  while ((getline l < f) > 0) { sub(/\r$/, "", l)
+    if (match(l, /^[ \t>*-]*[0-9]+\.[0-9]+(\.[0-9]+)*[ \t.)*]/)) { t = substr(l, RSTART, RLENGTH); gsub(/^[ \t>*-]+|[ \t.)*]+$/, "", t); A[++na] = t }
+    else if (l ~ /^#/ && match(l, /제[0-9]+조/)) K[++nk] = substr(l, RSTART, RLENGTH)
+    else if (match(l, /^(\*\*)?[0-9]+\.(\*\*)?[ \t]/)) { t = substr(l, RSTART, RLENGTH); gsub(/[^0-9]/, "", t); N[++nn] = t } }
+  close(f)
+  if (na) for (i = 1; i <= na; i++) LB[++NL] = A[i]
+  else if (nk) for (i = 1; i <= nk; i++) LB[++NL] = K[i]
+  else for (i = 1; i <= nn; i++) LB[++NL] = N[i]
+}
 function end_r() { if (cr != "" && !scn) report(cr_line, cr " has no scenario: add a case under it"); cr = "" }
 
 /^```/ { fence = !fence; next }
@@ -122,6 +148,11 @@ cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w 
   if (!p) report(FNR, cq " has a line with no label: start it with the label and a colon, as in the template")
   else if (substr(s, p + w) ~ /^[ \t]*$/) report(FNR, cq " has an empty \"" lab[nf] "\" line")
   else if (tl[nf] == "Who answers") no_role(FNR, substr(s, p + w)) }
+sec == "Sources" && /^- S[0-9]+\. / { s = $0; sub(/^- /, "", s); id = s; sub(/\..*/, "", id)
+  if (p = index($0, "Clauses:")) { cl_id[++ncl] = id; cl_line[ncl] = FNR; cl_rec[ncl] = substr($0, p + 8); cl_path[ncl] = first_path(substr($0, 1, p - 1))
+    n = split(cl_rec[ncl], a, ";"); for (k = 1; k <= n; k++) if (a[k] ~ /[^ \t.]/ && a[k] !~ /(^|[^A-Za-z0-9_])[RCQ][0-9]+/ && tolower(a[k]) !~ /n\/a/)
+      report(FNR, id " Clauses: \"" a[k] "\" names no C, R or Q item and does not say \"n/a: <why>\"") }
+  else if (tolower(first_path($0)) ~ /polic/) report(FNR, id " is a policy: end its line with the Clauses record the template shows, one entry per numbered clause") }
 /^- / { items[sec]++ }
 /^None\.[ \t]*$/ { none[sec] = FNR }
 sec == "" && /^Status:/ { status = $0; status_line = FNR }
@@ -129,7 +160,7 @@ sec == "" && /^Status:/ { status = $0; status_line = FNR }
 is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; line[ID] = FNR
   if (ID ~ /^R/) { end_r(); cr = ID; cr_line = FNR; scn = 0 }
   if (ID ~ /^Q/) open_q[ID] = 1
-  if (sec == "Open questions" && ID ~ /^Q/) { endq(); cq = ID; cq_line = FNR; nf = 0; n_tier[tier]++
+  if (sec == "Open questions" && ID ~ /^Q/) { endq(); cq = ID; cq_line = FNR; nf = 0; n_tier[tier]++; qtier[ID] = tier
     if (!tier) report(FNR, ID " is under no tier: put it under \"### Decide before building\" or \"### Can wait for planning\"") } }
 { s = " " $0
   while (match(s, /[^A-Za-z0-9_][RCQS][0-9]+/)) {
@@ -170,6 +201,15 @@ END { endq(); end_r()
   if (!n_out) report(1, "found no \"## Desired outcome\" items in the intent; check its headings")
   for (i = 1; i <= n_want; i++) if (!index(ledger, "\n" want[i]))
     report(1, "From the intent: no Outcome or Question line quoting \"" want[i] "\"")
+  for (i = 1; i <= ncl; i++) { s = " " cl_rec[i]
+    while (match(s, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
+      if (s !~ /^[0-9]/ && (id in qtier) && qtier[id] != 1) report(cl_line[i], cl_id[i] " Clauses: " id " is a clause'"'"'s reading or conflict, so it goes under \"Decide before building\"") }
+    f = ""; if (cl_path[i] ~ /^\//) f = cl_path[i]
+    else if (cl_path[i] != "") for (k = split(ROOTS, a, "|"); k; k--) if ((getline s < (a[k] "/" cl_path[i])) > 0) { close(a[k] "/" cl_path[i]); f = a[k] "/" cl_path[i] }
+    if (f == "") continue
+    split("", LB); read_clauses(f); m = ""; split("", told_cl)
+    for (k = 1; k <= NL; k++) if (!(LB[k] in told_cl) && !listed(cl_rec[i], LB[k])) { m = m (m == "" ? "" : ", ") LB[k]; told_cl[LB[k]] = 1 }
+    if (m != "") report(cl_line[i], cl_id[i] " Clauses: does not list " m " of " cl_path[i] ": record every numbered clause, as step 3 says") }
   for (id in name) if (id ~ /^[RC]/ && ((k = substr(id, 1, 1) SUBSEP name[id]) in old) && old[k] != id)
     report(line[id], id " has the name of " old[k] " in the superseded spec; keep the old id")
   exit bad

@@ -42,20 +42,23 @@ Draft the requirements in your head. For each, list what a builder would otherwi
 - a message that promises a person will act, such as "a manager will review it": who, what they see, and by when;
 - what each actor sees when something the work relies on fails, and for things under way at go-live, such as an invoice issued before and paid after;
 - existing users, records, and integrations: what each sees change, including records made the old way;
-- which policy or design rules this work could break, through its behavior, current behavior it keeps, or a choice the plan might make. Check what the code does against each rule's words, and whether a clause can be read two ways;
+- which policy or design rules this work could break, through its behavior, current behavior it keeps, or a choice the plan might make;
 - where two rules cannot both hold.
 
 Two people acting at once, rollback, switching off, and moving data over are the plan's, unless a likely answer changes what someone sees; then ask about that result, not the mechanism: what a buyer sees when stock runs out after they were told an item was held, not how a row is locked.
 
 ### 3. Settle what the sources settle; ask the rest
 
-Before writing a question, re-read the intent and the words of each rule it touches. If they settle the case, it is a constraint citing the clause or a requirement marked `(required by C<n> (Short name))`, never a question, even when today's code or data does not follow it. Don't ask how to build it, or about cases each already settled.
+Before writing any question, take every numbered clause of each policy this work touches, in order, and record each in that policy's Sources line (see the template) as one of:
 
-A policy clause that reads two ways, when the readings build different things, is never yours to settle: ask its owner, giving both readings with an example. What the code does today is a fact about today, never the answer.
+- **Settles**: what it requires here, as a constraint or a requirement marked `(required by C<n> (Short name))`, even when today's code or data does not follow it. Never a question: don't ask how to build it, or about cases it settles.
+- **Two readings**: two readings that build different things, each with an example and its result, as in "10% off orders over 50 items": off the whole order, 60 items at $2 cost $108; off the items over 50, $118. It is a question to the clause's owner. Today's code is a fact about today, never the answer: test each clause it applies, and each percentage, deadline, and undefined word, for a second reading.
+- **Conflict**: with another clause or with the intent, in a case with actual values where both cannot hold; record it under Conflicts (below). A clause that only limits how or where something is done, such as where data may be kept, settles; it is no conflict.
+- **n/a**: why, in a few words.
 
-Address each remaining gap to the role responsible for it: a policy's reading, exception, or waiver to the office or role the policy names as owner; a design limit, or a fact only an engineer can check, to the technical lead for that system; what counts as solving the problem, including a vague word in the outcome and the intent's own questions, to the originator; a case within another function's work, such as the front desk's, to the role running it; other product behavior to whoever decides the product's behavior. Name roles by responsibility, as in "privacy officer, or whoever approves new personal data collection", never people, even those a source names, and never "not named": a decider no source names is expected. One role decides each question, except that the owners of conflicting rules decide together; name another only to confirm an answer that could narrow the outcome (the originator) or make a constraint give way (its owner).
+Re-read the intent the same way. Then address each remaining gap to the role responsible for it: a policy's reading, exception, or waiver to the office or role the policy names as owner; a design limit, or a fact only an engineer can check, to the technical lead for that system; what counts as solving the problem, including a vague word in the outcome and the intent's own questions, to the originator; a case within another function's work, such as the front desk's, to the role running it; other product behavior to whoever decides the product's behavior. Name roles by responsibility, as in "privacy officer, or whoever approves new personal data collection", never people, even those a source names, and never "not named": a decider no source names is expected. One role decides each question, except that the owners of conflicting rules decide together; name another only to confirm an answer that could narrow the outcome (the originator) or make a constraint give way (its owner).
 
-Each question asks one thing: split one whose parts could get different answers, except that what one role decides about one item, in one tier, is one question in numbered parts. For a choice, give two to four lettered likely answers with the trade-offs that matter, none marked as recommended.
+Each question asks for one decision, except that what one role decides about one item (a screen, a message, a record, a case), in one tier, and would likely answer at one sitting, is one question in numbered parts, each with its own answers: "Receipt after a refund: 1. who gets it (a. the payer; b. the account holder); 2. whether it gives the reason (a. yes; b. no)". Never join different items, roles, or tiers. For a choice, give two to four lettered likely answers with the trade-offs that matter, none marked as recommended.
 
 Tier each question. **Can wait for planning** holds only a slot the plan leaves blank and fills before release: a value, a wording, a label, or a format, such as a button's label or how many results a page lists. Everything else is **Decide before building**: every conflict and policy reading, and any question that leaves open a situation, a case, a flow step, who qualifies or is told, an amount of money, what data is kept or shown, or a behavior, such as whether a cancelled order's discount code can be used again. When unsure, choose the first.
 
@@ -77,6 +80,8 @@ Use the headings of [references/spec-template.md](references/spec-template.md) i
   - A question of fact gives, for each likely result, what is built as a decided value with its marker; if that is not decided, it also needs a decision.
 
 Ids are stable within a spec and across a spec that supersedes it: never renumber, and a removed item leaves a gap. Cite an item by id and current name, as in `R2 (Weekly limit)`.
+
+Then trace each "must" sentence in Requirements and Changes to existing behavior to the intent's words, a clause, current behavior, a decided marker, or a named item. Current behavior settles only what stays as it is, never a case this work creates or one a clause words differently. Cut what you cannot trace, even what the intent seems to lean toward, and ask it as step 3 says.
 
 ### 5. Check the form
 
