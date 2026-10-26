@@ -4,22 +4,22 @@
 #   current name; S ids are defined under Sources, and "(current behavior, …)" cites one.
 # - Outside the header, Sources, fenced blocks, URLs and the intent's quoted words, no file path or code name
 #   (camelCase, snake_case, or a backticked identifier) appears: non-engineers read that prose.
-# - Each requirement has a scenario; each constraint has Kind:, Source: and Owner:, and no "Reason: not stated".
+# - Each requirement has a scenario; each constraint has Type:, Source: and Owner:, and no "Reason: not stated".
 # - No Roles or Conflicts line, constraint Owner:, or question's "Who answers" line says "not named" or
 #   "unnamed": each gives a role, by its responsibility.
 # - From the intent quotes each outcome and open question of the file on the "Intent:" line.
 # - Open questions starts with the template's note word for word, or with a translation of it (a paragraph
 #   that is not mostly the note's English words and names the labels the note quotes, as the questions do).
+#   When the intent is not in English (over 30% of its letters, outside headings and backticks, are Hangul, CJK,
+#   kana, Greek, Cyrillic, Hebrew or Arabic), the note and the question labels must not be the English ones.
 # - Open questions has "### Decide before building" then "### Can wait for planning", each listing questions or
 #   saying "None.", and no question outside them.
-# - Each open question has the template's labeled lines, in order, the last ("Until decided") optional and only
-#   under "Can wait for planning": the template's labels under the English note, otherwise the same translated
-#   labels on every question. A question without "Until decided" is named where its case is left out: in
-#   Requirements, Changes, Constraints, Conflicts or Out of scope.
+# - Each open question has the template's labeled lines, in order: the template's labels under the English
+#   note, otherwise the same translated labels on every question.
 # - The "Status:" line gives the number of questions under each tier, in that order.
 # - No "(decided by …)" marker cites an open question.
 # - Changes to existing behavior is present and says "None." exactly when it lists nothing.
-# - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id.
+# - A revision keeps each R and C name of the file on its "Supersedes:" line on the same id (R and C apart).
 # Prints "file:line: problem" per finding. Exits 0 when clean, 1 on findings, 2 on a usage error.
 set -eu
 spec=${1:?usage: check-spec.sh <spec.md>}
@@ -35,8 +35,11 @@ for f in "$dir/../intents/$name" "$dir/$name"; do   # never the spec itself, whi
 name=$(field Supersedes) old=/dev/null
 [ -z "$name" ] || old=$dir/$name
 [ -z "$name" ] || [ -f "$old" ] || { echo "$spec:1: superseded spec not found: $old"; exit 1; }
+letters() { LC_ALL=C sed -e '/^#/d' -e 's/`[^`]*`//g' "$intent" | LC_ALL=C tr -cd "$1" | wc -c; }
+foreign=$(letters '\316-\333\343-\355') latin=$(letters 'A-Za-z')
+foreign=$(( foreign * 10 > (foreign + latin) * 3 ))   # 1 when the intent is not in English
 
-awk -v SPEC="$spec" '
+awk -v SPEC="$spec" -v FOREIGN="$foreign" '
 function report(l, m) { print SPEC ":" l ": " m; bad = 1 }
 function english_share(t,   a, n, i, w, hit) {   # share of the words of t that are words of the template note
   if (!n_ew) { w = tolower(note); gsub(/[^a-z]+/, " ", w); n_ew = split(w, a, " "); for (i = 1; i <= n_ew; i++) ew[a[i]] = 1 }
@@ -45,12 +48,11 @@ function english_share(t,   a, n, i, w, hit) {   # share of the words of t that 
 }
 function endq(   k, want) {   # checks the labeled lines of the open question just read
   if (cq == "") return
-  if (nf == ntl - 1) nound[cq] = cq_line
-  if (nf == ntl && cq_tier == 1) report(cq_line, cq " is to decide before building, so nothing is built around it meanwhile: remove its \"" lab[nf] "\" line, or move it to Can wait for planning")
-  if (nf != ntl && nf != ntl - 1) report(cq_line, cq " has " nf " labeled lines; it needs " ntl - 1 " or " ntl ", as in the template")
+  if (nf != ntl) report(cq_line, cq " has " nf " labeled lines; it needs " ntl ", as in the template")
   else for (k = 1; k <= nf; k++) {
     if (!eng && !(k in fl)) { fl[k] = lab[k]; if (tr != "" && index(note, "\"" tl[k] "\"") && !index(tr, lab[k]))
-      report(cq_line, "the Open questions note does not name \"" lab[k] "\", the label " cq " uses for \"" tl[k] "\"") }
+      report(cq_line, "the Open questions note does not name \"" lab[k] "\", the label " cq " uses for \"" tl[k] "\"")
+      if (FOREIGN && lab[k] == tl[k]) report(cq_line, "\"" tl[k] "\" is the English label, but the intent is not in English: translate it, as step 4 says") }
     want = eng ? tl[k] : fl[k]
     if (lab[k] != want) { report(cq_line, cq ": line " k " is labeled \"" lab[k] "\"; expected \"" want "\""); break }
   }
@@ -75,7 +77,7 @@ f == 2 && /^## / { isec = $0; next }
 f == 2 { if ((isec == "## Desired outcome" || isec == "## Open questions") && NF && !/^[ \t]/ && !/^</) {
            s = $0; sub(/^[ \t]*(- )?/, "", s); sub(/[ \t.]*$/, "", s); if (s != "None") want[++n_want] = s; n_out += isec ~ /outcome/ }
          next }
-f == 3 { if (is_def() && NM != "") old[NM] = ID; next }
+f == 3 { if (is_def() && NM != "") old[substr(ID, 1, 1), NM] = ID; next }
 function code_name(t,   a, n, i, w) {   # the first file path or code name in t, or ""
   gsub(/https?:\/\/[^ \t)>]+/, "", t)
   n = split(t, a, /[ \t]+/)
@@ -104,12 +106,14 @@ sec == "Requirements" && /^- / { scn = 1 }
 sec != "" && sec != "Sources" { s = $0; if (/^- (Outcome|Question) "/) gsub(/"[^"]*"/, "", s)
   if ((w = code_name(s)) != "") report(FNR, "\"" w "\" is a file or code name: say it in plain words and cite S<n> (Name); names go under Sources")
   s = $0; while (match(s, /\(current behavior, [^)]*/)) { if (substr(s, RSTART, RLENGTH) !~ /, S[0-9]+/) report(FNR, "a (current behavior, …) marker must cite S<n> (Name) from Sources"); s = substr(s, RSTART + RLENGTH) } }
-sec == "Constraints" && /^- C[0-9]+\. / { for (k = split("Kind:|Source:|Owner:", cf, "|"); k; k--) if (!index($0, cf[k])) report(FNR, "constraint has no \"" cf[k] "\"")
+sec == "Constraints" && /^- C[0-9]+\. / { for (k = split("Type:|Source:|Owner:", cf, "|"); k; k--) if (!index($0, cf[k])) report(FNR, "constraint has no \"" cf[k] "\"")
   if ($0 ~ /Reason:[ \t]*(not stated|none|n\/a|unknown)/) report(FNR, "omit Reason when the source states none")
   if (p = index($0, "Owner:")) no_role(FNR, substr($0, p)) }
 (sec == "Roles" || sec == "Conflicts") && /^- / { no_role(FNR, $0) }
 due && NF { due = 0
-  if ($0 == note) { eng = 1; next }
+  if ($0 == note) { eng = 1
+    if (FOREIGN) report(FNR, "the intent is not in English: translate the Open questions note and the question labels into its language")
+    next }
   if ($0 !~ /^(- |[ \t]|None\.)/ && english_share($0) <= 0.5) { tr = $0; next }
   report(FNR, "Open questions must start with the template'"'"'s note, word for word, or its faithful translation") }
 cq != "" && /^[ \t]+- / { s = $0; sub(/^[ \t]+- /, "", s); p = index(s, ":"); w = index(s, "\357\274\232")   # ASCII or full-width colon
@@ -125,7 +129,7 @@ sec == "" && /^Status:/ { status = $0; status_line = FNR }
 is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; line[ID] = FNR
   if (ID ~ /^R/) { end_r(); cr = ID; cr_line = FNR; scn = 0 }
   if (ID ~ /^Q/) open_q[ID] = 1
-  if (sec == "Open questions" && ID ~ /^Q/) { endq(); cq = ID; cq_line = FNR; cq_tier = tier; nf = 0; n_tier[tier]++
+  if (sec == "Open questions" && ID ~ /^Q/) { endq(); cq = ID; cq_line = FNR; nf = 0; n_tier[tier]++
     if (!tier) report(FNR, ID " is under no tier: put it under \"### Decide before building\" or \"### Can wait for planning\"") } }
 { s = " " $0
   while (match(s, /[^A-Za-z0-9_][RCQS][0-9]+/)) {
@@ -134,10 +138,8 @@ is_def() { if (ID in name) report(FNR, ID " is defined twice"); name[ID] = NM; l
     ref[++n_ref] = id; ref_line[n_ref] = FNR; ref_nm[n_ref] = ""
     if (id !~ /^Q/ && match(s, /^ \([^)]*\)/)) ref_nm[n_ref] = substr(s, 3, RLENGTH - 3)
   } }
-{ s = " " $0; m = ""   # Q ids inside "(decided by …)" markers, and outside them
+{ s = " " $0; m = ""   # Q ids inside "(decided by …)" markers
   while (match(s, /\(decided by [^()]*\)/)) { m = m " " substr(s, RSTART, RLENGTH); s = substr(s, 1, RSTART - 1) " " substr(s, RSTART + RLENGTH) }
-  while (match(s, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(s, RSTART + 1, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
-    if (s !~ /^[A-Za-z0-9_]/ && sec ~ /^(Requirements|Changes to existing behavior|Constraints|Conflicts|Out of scope)$/) held[id] = 1 }
   while (match(m, /[^A-Za-z0-9_]Q[0-9]+/)) { id = substr(m, RSTART + 1, RLENGTH - 1); m = substr(m, RSTART + RLENGTH)
     if (m !~ /^[A-Za-z0-9_]/) { mref[++n_m] = id; mref_line[n_m] = FNR } } }
 
@@ -165,12 +167,10 @@ END { endq(); end_r()
     report(status_line, "Status: says " cnt[i] " under \"" tn[i] "\", but it lists " n_tier[i] + 0)
   for (i = 1; i <= n_m; i++) if (mref[i] in open_q)
     report(mref_line[i], mref[i] " is an open question, so a (decided by …) marker cannot cite it")
-  for (id in nound) if (!(id in held))
-    report(nound[id], id " has no \"Until decided\" line, so name it where its case is left out, as in \"… waits for " id "\"")
   if (!n_out) report(1, "found no \"## Desired outcome\" items in the intent; check its headings")
   for (i = 1; i <= n_want; i++) if (!index(ledger, "\n" want[i]))
     report(1, "From the intent: no Outcome or Question line quoting \"" want[i] "\"")
-  for (id in name) if (id !~ /^S/ && (name[id] in old) && old[name[id]] != id)
-    report(line[id], id " has the name of " old[name[id]] " in the superseded spec; keep the old id")
+  for (id in name) if (id ~ /^[RC]/ && ((k = substr(id, 1, 1) SUBSEP name[id]) in old) && old[k] != id)
+    report(line[id], id " has the name of " old[k] " in the superseded spec; keep the old id")
   exit bad
 }' "$template" "$intent" "$old" "$spec"
