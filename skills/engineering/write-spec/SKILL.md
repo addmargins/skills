@@ -70,7 +70,7 @@ In each tier, put conflicts and policy readings first, then the main flow. Keep 
 
 ### 4. Write the spec
 
-Use the headings of [references/spec-template.md](references/spec-template.md) in order; its placeholders say what each slot holds. Write in the intent's language, but keep headings, ids, field names, markers, and `None.` in English. In a spec not in English, translate the Open questions note and the four question labels faithfully, each label still followed by a colon, and use the same labels in the note and on every question.
+Use the headings of [references/spec-template.md](references/spec-template.md) in order; its placeholders say what each slot holds. Write in the intent's language, but keep headings, ids, field names, markers, and `None.` in English. In a spec not in English, translate the Open questions note, the four question labels, and the Sources summary faithfully, each label still followed by a colon, and use the same labels in the note and on every question.
 
 - **Requirements**: one behavior someone outside can check per requirement; what only the inside can check is plan material or a constraint. Quote a message's exact wording only when someone decided it or depends on it, such as consent text, a promise about money or deadlines, or text another system parses; otherwise give its meaning. Each "then" names a value, a state, a message's meaning, or what the observer can do next.
 - **Changes to existing behavior**: one row per behavior in use that changes; when the new behavior needs scenarios, write a requirement and point the row at it.
@@ -78,6 +78,7 @@ Use the headings of [references/spec-template.md](references/spec-template.md) i
 - **Open questions**: start with the template's note, word for word or translated as above. Keep each line to a sentence or two.
   - Under "Depends on the answer", a question about a constraint also names the requirements it changes; a conflict names both items.
   - A question of fact gives, for each likely result, what is built as a decided value with its marker; if that is not decided, it also needs a decision.
+- **Sources**: an appendix for engineers, folded so other readers pass it by. Keep the template's `<details>` and `</details>` lines and the blank lines around the list, with the summary word for word or translated as above. A line may start with a few plain words on what was read, before the file and the names, using no engineering words.
 
 Ids are stable within a spec and across a spec that supersedes it: never renumber, and a removed item leaves a gap. Cite an item by id and current name, as in `R2 (Weekly limit)`.
 

@@ -23,6 +23,9 @@
 # - A Sources line whose path names a policy file ends with a "Clauses:" record (step 3): each entry names a C, R or
 #   Q item or says "n/a", each Q it names is under "Decide before building", and, when the file can be found from
 #   the workspace root, every numbered clause in it ("2.3", "제4조", or a top-level "1.") is listed.
+# - Sources is the last section, and its list sits in the template's engineer appendix: a "<details><summary>"
+#   line first, its summary the template's word for word or, when the intent is not in English, a translation of
+#   all of it ("<who>: <what> (<who may skip>)"), then a blank line, the S lines, and "</details>".
 # Prints "file:line: problem" per finding. Exits 0 when clean, 1 on findings, 2 on a usage error.
 set -eu
 spec=${1:?usage: check-spec.sh <spec.md>}
@@ -71,6 +74,7 @@ function is_def(   s) {   # sets ID and NM when this line defines an R, C, Q or 
 { sub(/\r$/, "") }
 FNR == 1 { for (f = 1; f < ARGC && ARGV[f] != FILENAME; f++) ; }
 f == 1 { if (/^## /) { tsec = $0; next }
+         if (tsec == "## Sources" && /^<details><summary>.*<\/summary>[ \t]*$/) { tsum = $0; sub(/^<details><summary>/, "", tsum); sub(/<\/summary>[ \t]*$/, "", tsum) }
          if (tsec != "## Open questions" || !NF || /^</ || /^#/ || tdone) next
          if (/^- /) { if (inq) { tdone = 1; next } inq = 1 }
          else if (inq && match($0, /^[ \t]+- [^:]+:/)) { s = substr($0, 1, RLENGTH - 1); sub(/^[ \t]+- /, "", s); tl[++ntl] = s }
@@ -115,11 +119,18 @@ function read_clauses(f,   l, t, na, nk, nn, A, K, N, i) {   # sets LB[1..NL] to
   else if (nk) for (i = 1; i <= nk; i++) LB[++NL] = K[i]
   else for (i = 1; i <= nn; i++) LB[++NL] = N[i]
 }
+function check_summary(l, s) {   # the summary of the Sources appendix
+  if (s == tsum) { if (FOREIGN) report(l, "the intent is not in English: translate the Sources summary, as step 4 says"); return }
+  if (!FOREIGN) report(l, "the Sources summary must be the template'"'"'s, word for word: \"" tsum "\"")
+  else if (s !~ /(:|\357\274\232).+(\(|\357\274\210).+(\)|\357\274\211)[ \t]*$/ || english_share(s) > 0.5)
+    report(l, "the Sources summary must translate all of the template'"'"'s: who it is for, what it lists, and, in parentheses, that other readers can skip it")
+}
 function end_r() { if (cr != "" && !scn) report(cr_line, cr " has no scenario: add a case under it"); cr = "" }
 
 /^```/ { fence = !fence; next }
 fence { next }
-/^## / { endq(); end_r(); sec = substr($0, 4); seen[sec] = FNR; due = (sec == "Open questions"); next }
+/^## / { endq(); end_r(); if (sec == "Sources") report(FNR, "\"" $0 "\" comes after Sources: keep Sources the last section")
+  sec = substr($0, 4); seen[sec] = FNR; due = (sec == "Open questions"); next }
 sec == "Open questions" && /^### / { endq(); s = substr($0, 5); sub(/[ \t]+$/, "", s)
   if (due) report(FNR, "Open questions must start with the template'"'"'s note, word for word, or its faithful translation"); due = 0
   if (s == "Decide before building" && !tier) tier = 1
@@ -153,6 +164,12 @@ sec == "Sources" && /^- S[0-9]+\. / { s = $0; sub(/^- /, "", s); id = s; sub(/\.
     n = split(cl_rec[ncl], a, ";"); for (k = 1; k <= n; k++) if (a[k] ~ /[^ \t.]/ && a[k] !~ /(^|[^A-Za-z0-9_])[RCQ][0-9]+/ && tolower(a[k]) !~ /n\/a/)
       report(FNR, id " Clauses: \"" a[k] "\" names no C, R or Q item and does not say \"n/a: <why>\"") }
   else if (tolower(first_path($0)) ~ /polic/) report(FNR, id " is a policy: end its line with the Clauses record the template shows, one entry per numbered clause") }
+sec == "Sources" && !src_open && !src_told && NF { if (/^<details><summary>.*<\/summary>[ \t]*$/) {
+    src_open = FNR; s = $0; sub(/^<details><summary>/, "", s); sub(/<\/summary>[ \t]*$/, "", s); check_summary(FNR, s); next }
+  report(FNR, "Sources must start with the template'"'"'s line \"<details><summary>" tsum "</summary>\" (translated in a spec not in English), then a blank line, the S lines, and \"</details>\": the list is an appendix for engineers"); src_told = 1 }
+sec == "Sources" && src_open == FNR - 1 && NF { report(FNR, "leave a blank line after the <summary> line, or the list inside it is not rendered as a list") }
+sec == "Sources" && src_open && /^<\/details>[ \t]*$/ { src_close = FNR }
+sec == "Sources" && src_close && /^- S[0-9]+\. / { report(FNR, "this S line is after </details>: keep every S line inside the engineer appendix") }
 /^- / { items[sec]++ }
 /^None\.[ \t]*$/ { none[sec] = FNR }
 sec == "" && /^Status:/ { status = $0; status_line = FNR }
@@ -180,6 +197,8 @@ END { endq(); end_r()
     else if (ref_nm[i] != "" && ref_nm[i] != name[id])
       report(ref_line[i], id " is cited as \"" ref_nm[i] "\" but is named \"" name[id] "\"")
   }
+  if ("Sources" in seen && !src_told) { if (!src_open) report(seen["Sources"], "Sources must wrap its list in the template'"'"'s <details><summary>" tsum "</summary> … </details> block")
+    else if (!src_close) report(src_open, "close the engineer appendix with a \"</details>\" line after the last S line") }
   s = "Changes to existing behavior"
   if (!(s in seen)) report(1, "no \"## " s "\" section")
   else if (!items[s] && !(s in none)) report(seen[s], "\"" s "\" lists nothing: write \"None.\" under it")
