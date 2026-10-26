@@ -19,7 +19,7 @@ Status: <number> to decide before building, <number> that can wait for planning.
 
 ## Requirements
 ### R1. <Actor>: <short name>
-<"Must" sentences: what the actor or another system observes.>
+<"Must" sentences: what the actor or another system observes, each value in its source's words.>
 
 - Given <situation, with actual values>, when <action>, then <what is seen or returned, with actual values>.
 - <Another case only when its result does not follow from the rule above, or at the exact value of each threshold, with the result on each side.>
@@ -36,7 +36,7 @@ Policies or laws commonly govern each area below that this work changes. The rol
   - After: <what happens once built>.
   - Affects: <R<n> (Short name), …>.
   - Policy text: <document> (S<n>), <clause number>: "<the clause, word for word>". <One line per clause; with none in the workspace: No policy document for this area found in the workspace.>
-  - Confirm in: Q<n>.
+  - Confirm in: Q<n>. <The same question for every area under this role.>
 
 ## Constraints
 - C1. <Short name>: <the limit in one checkable sentence>. Type: limit (<of a system or contract, or set by the intent>). Source: <"verified in S<n> (Plain name)", "claimed in S<n> (Plain name), not verified", or the intent>. Owner: <the role that can change it>. Reason: <only as the source states one, else omit>.
@@ -52,12 +52,12 @@ Policies or laws commonly govern each area below that this work changes. The rol
 Everything outside these questions is decided. Those under "Decide before building" leave open a case, a step, or who qualifies, so they are answered before building starts. Those under "Can wait for planning" only fill a value, a wording, a label, or a format, which the plan leaves blank and fills before release. The role under "Who answers" decides; anyone may settle a fact by checking.
 
 ### Decide before building
-<Each area's question, then each leaving a case, a step, who qualifies, or a behavior open; else "None.">
+<Each role's area question, then each leaving a case, a step, who qualifies, or a behavior open; else "None.">
 
 - Q1. <Short name>
-  - What is unclear: <one sentence, naming the case or slot left open; for an area, which policies or laws apply and what they require.>
-  - Depends on the answer: <for each likely answer, which R or C items change and how; for an area, its R items.>
-  - To resolve: <the decision to make, or the fact to check and why it was not checked.>
+  - What is unclear: <one sentence, naming the case or slot left open; for a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require", with no clause number or quote.>
+  - Depends on the answer: <for each likely answer, which R or C items change and how; for areas: the requirements each area's Affects names.>
+  - To resolve: <the concrete decision or check that settles it: what the decider fixes, such as "who receives the receipt after a refund", or the record to check, where, and why it was not checked here; for areas: the role names the rules governing each and confirms or corrects its quotes. Not just "choose a or b".>
   - Who answers: <the role, as under Roles; for an area, its role heading.>
 
 ### Can wait for planning
