@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // check-spec.mjs <spec.md>: facts a reader of spec.md alone cannot check. Each id is defined once and each reference
-// resolves, no (decided by …) marker cites an open question, a revision keeps its ids, each requirement has a
-// scenario, From the intent covers the intent, tiers and Status: counts add up, each area is confirmed in a question
-// to decide before building, and quotes match their files. A pass means only that. Prints "file:line: problem".
+// resolves, a revision keeps its ids, a "decided by" marker appears only in a revision, names the spec it supersedes,
+// and cites no open question, each requirement has a scenario, From the intent covers the intent, tiers and Status:
+// counts add up, each area is confirmed in a question to decide before building, and quotes match their files. A pass
+// means only that. Prints "file:line: problem".
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -19,6 +20,7 @@ const CITE = "cite the quoted document as S<n> (Name), listed under Sources with
 const HAND = "check the quote by hand and say so in your final message";
 const EXACT = "quote the clause exactly, never a summary; quote separate parts separately";
 const LIST = "quote the list too, here or in the next quote";
+const DROP = "for a value a policy sets, drop the value and name the area's question";
 
 process.on("uncaughtException", (e) => {
 	console.error(`check-spec: internal error: ${e.message}`);
@@ -50,6 +52,15 @@ const def = (text, sec) => {
 	if ((kind === "S" && sec !== "Sources") || (kind === "A" && sec !== AREAS)) return null;
 	const name = kind === "R" ? m[3].replace(/^[^:]*: /, "") : kind === "C" ? m[3].replace(/:.*/, "") : m[3];
 	return { id: m[2], name: trimEnd(name) };
+};
+// a marker from its "(" to the matching ")", else to the end of the line
+const marker = (t, at) => {
+	let depth = 0;
+	for (let i = at; i < t.length; i++) {
+		depth += t[i] === "(" ? 1 : t[i] === ")" ? -1 : 0;
+		if (!depth) return t.slice(at, i + 1);
+	}
+	return t.slice(at);
 };
 // the file an S line names: in backticks, else the first word with / or .ext
 const firstPath = (t) => {
@@ -157,9 +168,7 @@ lines.forEach((text, i) => {
 	// quoted text is not a reference
 	const prose = POLICY.test(text) ? text.replace(/".*/, "") : LEDGER.test(text) ? text.replace(/"[^"]*"/g, "") : text;
 	for (const m of prose.matchAll(ID)) refs.push({ n, id: m[0] });
-	for (const m of text.matchAll(/\(decided by [^()]*\)/g)) {
-		for (const q of m[0].matchAll(/(?<![A-Za-z0-9_])Q[0-9]+/g)) decidedBy.push({ n, id: q[0] });
-	}
+	for (const m of text.matchAll(/\(decided by\b/gi)) decidedBy.push({ n, text: marker(text, m.index) });
 });
 endReq();
 
@@ -171,8 +180,15 @@ for (const r of refs) {
 	told.add(r.id);
 	fail(r.n, `${r.id} is referenced but not defined`);
 }
-for (const r of decidedBy) {
-	if (qTier.has(r.id)) fail(r.n, `${r.id} is an open question, so a (decided by …) marker cannot cite it`);
+for (const { n, text } of decidedBy) {
+	for (const q of text.matchAll(/(?<![A-Za-z0-9_])Q[0-9]+/g)) {
+		if (qTier.has(q[0])) fail(n, `${q[0]} is an open question, so a (decided by …) marker cannot cite it`);
+	}
+	if (!oldName) {
+		fail(n, `(decided by …) may cite only the spec this one supersedes, and this spec supersedes none; ${DROP}`);
+	} else if (!text.includes(path.basename(oldName))) {
+		fail(n, `(decided by …) may cite only the spec this one supersedes (${oldName}); ${DROP}`);
+	}
 }
 for (const w of want) if (!ledger.includes(w)) fail(1, `From the intent: no Outcome or Question line quoting "${w}"`);
 for (const [id, d] of defs) {

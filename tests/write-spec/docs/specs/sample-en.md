@@ -36,8 +36,6 @@ Policies or laws commonly govern each area below that this work changes. The rol
 
 ### Finance team lead, or whoever owns the deposit and refund policy
 - A1. Deposit refunds made by the app
-  - Today: desk staff work out and enter each refund (current behavior, S1 (Booking cancellation)).
-  - After: the app refunds the deposit to the card that paid when the patient confirms, with no staff input.
   - Affects: R1 (Cancel in the app).
   - Policy text: Deposit policy (S3), 4.1: "A cancellation up to one day before the appointment gets the whole deposit back."
   - Policy text: Deposit policy (S3), 4.2: "A later cancellation up to 3 hours before gets 50% back."
@@ -46,8 +44,6 @@ Policies or laws commonly govern each area below that this work changes. The rol
 
 ### Owner of patient notice rules, or whoever approves what patients are told about money
 - A2. Messages to patients about a cancellation
-  - Today: after desk staff cancel, the patient gets a text naming the branch and time (current behavior, S1 (Booking cancellation)).
-  - After: the same text goes out after a cancellation in the app, with no staff involved.
   - Affects: R1 (Cancel in the app).
   - Policy text: Patient notice rules (S4), 2.1: “A cancellation text must give: the branch and the time of the appointment; the amount refunded, if any.”
   - Confirm in: Q2.

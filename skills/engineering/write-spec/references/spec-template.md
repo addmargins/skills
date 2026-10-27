@@ -19,10 +19,10 @@ Status: <number> to decide before building, <number> that can wait for planning.
 
 ## Requirements
 ### R1. <Actor>: <short name>
-<"Must" sentences: what the actor or another system observes, each value in its source's words.>
+<"Must" sentences: what the actor or another system observes, each value in its source's words or, for a value a policy sets, the Q that sets it.>
 
-- Given <situation, with actual values>, when <action>, then <what is seen or returned, with actual values>.
-- <Another case only when its result does not follow from the rule above, or at the exact value of each threshold, with the result on each side.>
+- Given <situation, with actual values or the Q that sets each>, when <action>, then <what is seen or returned, with actual values or the Q that sets each>.
+- <Another case only when its result does not follow from the rule above, or at the exact value of each threshold the spec states, with the result on each side.>
 
 ## Changes to existing behavior
 - Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, data, or integrations>. Can be undone: <yes, or what stays done, such as money paid>.
@@ -32,8 +32,6 @@ Policies or laws commonly govern each area below that this work changes. The rol
 
 ### <Role that confirms the rules for these areas>
 - A1. <Area, in plain words, such as "Bank details kept for payouts">
-  - Today: <what happens now, with its marker, or "nothing">.
-  - After: <what happens once built>.
   - Affects: <R<n> (Short name), …>.
   - Policy text: <document> (S<n>), <clause number>: "<the clause, word for word>". <One line per clause; with none in the workspace: No policy document for this area found in the workspace.>
   - Confirm in: Q<n>. <The same question for every area under this role.>
@@ -45,7 +43,7 @@ Policies or laws commonly govern each area below that this work changes. The rol
 - <What a reader might expect covered that is not, and any reason given.>
 
 ## From the intent
-- Outcome "<desired outcome, quoted>": <R<n> (Short name), …>. <Each vague word in it: "<word>" means <value>, with its marker.>
+- Outcome "<desired outcome, quoted>": <R<n> (Short name), …>. <Each vague word in it: "<word>" means <value>, with its marker, or is set by Q<n>.>
 - Question "<intent open question, quoted>": <answered by R<n> (Short name) | answered by Out of scope (<marker>) | carried as Q<n> | open, but every answer builds the same: <why> | no longer applies: <reason>, agreed by <intent originator>, <where>>.
 
 ## Open questions

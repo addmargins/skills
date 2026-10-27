@@ -64,8 +64,15 @@ test("no-such-file", () => {
 fails("undefined-id", "Q9 is referenced but not defined", "sample-en", "carried as Q4.", "carried as Q9.");
 fails("defined-twice", "Q4 is defined twice", "sample-en",
 	"- Q5. Wording after a move", "- Q4. Wording after a move");
-fails("decided-by-open-q", "Q4 is an open question, so a (decided by", "sample-en",
-	"without paying a second deposit.", "without paying a second deposit (decided by the originator, Q4).");
+const booked = "the new time and branch are booked";
+fails("decided-by-open-q", "Q4 is an open question, so a (decided by", "sample-en-v2",
+	booked, `${booked} (decided by the originator, sample-en.md Q4)`);
+fails("decided-by-no-supersedes", "may cite only the spec this one supersedes, and this spec supersedes none",
+	"sample-en", "without paying a second deposit.",
+	"without paying a second deposit (decided by the finance team lead, S3 (Deposit policy) 4.2).");
+fails("decided-by-other-file", "may cite only the spec this one supersedes (sample-en.md)", "sample-en-v2",
+	booked, `${booked} (decided by the finance team lead, S3 (Deposit policy) 4.2)`);
+passes("ok-decided-by-supersedes", "sample-en-v2", booked, `${booked} (decided by the originator, sample-en.md R2)`);
 fails("no-scenario", "R2 has no scenario", "sample-en",
 	"- Given a 2026-11-10 10:00 appointment, when the patient moves it to the same doctor",
 	"Given a 2026-11-10 10:00 appointment, when the patient moves it to the same doctor");
