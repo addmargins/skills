@@ -78,7 +78,7 @@ Then trace each "must" sentence in Requirements and Changes to existing behavior
 
 ### 6. Check the form
 
-Run `node <this skill's directory>/scripts/check-spec.mjs <spec file>` and fix what it prints until it prints only "not verified" lines. Passing means its ids, references, counts, and quotes resolve, not that the spec is good. If a line is wrong about the spec, don't change correct text to silence it; say so in your final message. If node is not installed, say in your final message that the check did not run, never that it passed.
+Run `node <this skill's directory>/scripts/check-spec.mjs <spec file>` and fix what it prints until it prints only "not verified" lines. Passing means its ids, references, counts, and quotes resolve and prose names no code it can identify, not that the spec is good. If a line is wrong about the spec, don't change correct text to silence it; say so in your final message. If node is not installed, say in your final message that the check did not run, never that it passed.
 
 ### 7. Check with a fresh reader
 
