@@ -14,7 +14,6 @@ before(() => {
 	tmp = mkdtempSync(join(tmpdir(), "check-spec-test-"));
 	cpSync(join(here, "docs"), join(tmp, "docs"), { recursive: true });
 	cpSync(join(here, "policies"), join(tmp, "policies"), { recursive: true });
-	cpSync(join(here, "src"), join(tmp, "src"), { recursive: true });
 });
 after(() => rmSync(tmp, { recursive: true, force: true }));
 
@@ -135,25 +134,8 @@ passes("ok-quotes-split", "sample-en",
 const cancelText = "The cancellation text names the branch and time, as today";
 fails("code-backtick", "`cancelBooking` is in backticks, which mark code", "sample-en",
 	"the app's cancel button shows only", "the app's `cancelBooking` shows only");
-fails("code-declared-constant", "BOOKING_WINDOW_DAYS is a name the code in S4 (src/booking/config.ts) declares", "sample-ko",
-	"앱 예약 가능 기간 90일을 줄이지 않는다.", "앱 예약 가능 기간 90일(BOOKING_WINDOW_DAYS)을 줄이지 않는다.");
-fails("code-union-member", "CANCELLED is a name the code in S1 (src/booking/cancel.ts) declares", "sample-en",
-	"then the appointment is cancelled", "then the appointment is CANCELLED");
-fails("code-enum-member", "DESK_STAFF is a name the code in S1", "sample-en",
-	"desk staff cancel and enter the refund", "DESK_STAFF cancel and enter the refund");
-fails("code-object-key", "HOURS_BEFORE is a name the code in S1", "sample-en",
-	"in the app up to 3 hours before it starts.", "in the app up to HOURS_BEFORE before it starts.");
-fails("code-path", "src/booking/cancel.ts is a path in the workspace", "sample-en",
-	`${cancelText} (current behavior, S1 (Booking cancellation)).`, `${cancelText} (src/booking/cancel.ts).`);
+fails("code-path", "policies/POL-NTC-003-en.md is a path in the workspace", "sample-en",
+	`${cancelText} (current behavior, S1 (Booking cancellation)).`, `${cancelText} (policies/POL-NTC-003-en.md).`);
 passes("ok-code-name-under-sources", "sample-en",
 	"- S1. Booking cancellation: src/booking/cancel.ts, cancelBooking.",
-	"- S1. Booking cancellation: src/booking/cancel.ts, cancelBooking, BookingStatus (BOOKED, CANCELLED).");
-passes("ok-code-name-in-policy", "sample-ko", "앱 예약 가능 기간 90일을 줄이지 않는다.", "앱 예약 가능 기간 90일(KST 기준)을 줄이지 않는다.");
-passes("ok-code-comment-and-word", "sample-en", "then the appointment is cancelled", "then the appointment is NOT_DECLARED");
-test("ok-code-name-in-intent", () => {
-	const intent = readFileSync(join(tmp, "docs/intents/0002-app-cancellation-en.md"), "utf8");
-	writeFileSync(join(tmp, "docs/intents/0002-booked.md"), `${intent}\nA BOOKED appointment is one not yet cancelled.\n`);
-	const result = run(variant("ok-code-name-in-intent", "sample-en", "Intent: 0002-app-cancellation-en.md",
-		"Intent: 0002-booked.md", "then the appointment is cancelled", "then the appointment is no longer BOOKED"));
-	assert.equal(result.status, 0, result.stdout);
-});
+	"- S1. Booking cancellation: `src/booking/cancel.ts`, `cancelBooking`, `BookingStatus` (BOOKED, CANCELLED).");

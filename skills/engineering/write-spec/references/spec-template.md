@@ -33,7 +33,7 @@ Policies or laws commonly govern each area below that this work changes. The rol
 ### <Role that confirms the rules for these areas>
 - A1. <Area, in plain words, such as "Bank details kept for payouts">
   - Affects: <R<n> (Short name), …>.
-  - Policy text: <document> (S<n>), <clause number>: "<the clause, word for word>". <One line per clause; with none in the workspace: No policy document for this area found in the workspace.>
+  - Policy text: <document> (S<n>), <clause number>: "<the clause, word for word, with its items>". <One line per clause; with none in the workspace: No policy document for this area found in the workspace.>
   - Confirm in: Q<n>. <The same question for every area under this role.>
 
 ## Constraints

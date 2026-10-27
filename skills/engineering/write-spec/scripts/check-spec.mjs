@@ -3,8 +3,7 @@
 // resolves, a revision keeps its ids, a "decided by" marker appears only in a revision, names the spec it supersedes,
 // and cites no open question, each requirement has a scenario, From the intent covers the intent, tiers and Status:
 // counts add up, each area is confirmed in a question to decide before building, quotes match their files, and prose
-// outside Sources has no backticks, workspace paths, or names the cited code declares. A pass means only that. Prints
-// "file:line: problem".
+// outside Sources has no backticks or workspace paths. A pass means only that. Prints "file:line: problem".
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -22,9 +21,6 @@ const HAND = "check the quote by hand and say so in your final message";
 const EXACT = "quote the clause exactly, never a summary; quote separate parts separately";
 const LIST = "quote the list too, here or in the next quote";
 const DROP = "for a value a policy sets, drop the value and name the area's question";
-const CODE = /\.([cm]?[jt]s|[jt]sx)$/;
-const TOKEN = /[A-Za-z_$][A-Za-z0-9_$]*/g;
-const WORD = /^[A-Za-z][a-z]*$/;
 const PLAIN = "name it in plain words, and keep the code name under Sources";
 
 process.on("uncaughtException", (e) => {
@@ -76,78 +72,6 @@ const firstPath = (t) => {
 	const words = t.split(/[ \t]+/).map((w) => w.replace(/^[(`"]+|[.,;:)`"]+$/g, ""));
 	return words.find((w) => w.includes("/") || /\.[a-z]+$/.test(w)) ?? "";
 };
-// every file an S line names: each backtick span, and each word with / or .ext
-const allPaths = (t) => [...t.matchAll(/`([^`]+)`/g)].map((m) => m[1]).concat(t.replace(/`[^`]*`/g, " ")
-	.split(/[ \t]+/).map((w) => w.replace(/^[("]+|[.,;:)"]+$/g, "")).filter((w) => w.includes("/") || EXT.test(w)));
-// the names a JavaScript or TypeScript file declares: top-level const, let, var, function, class, enum, type, and
-// interface names; the members of those enums and interfaces; the keys of an object such a variable or type is set
-// to; and each string in a union (a | b)
-const declares = (src) => {
-	let code = "", bare = "", q = "", from = 0;
-	const strings = [];
-	for (let i = 0; i < src.length; i++) {
-		const c = src[i];
-		if (q) {
-			const esc = c === "\\";
-			code += esc ? c + (src[i + 1] ?? "") : c;
-			bare += esc ? "  " : c === q || c === "\n" ? c : " ";
-			if (esc) i++;
-			else if (c === q) {
-				strings.push({ at: from, end: code.length, text: code.slice(from + 1, -1) });
-				q = "";
-			}
-		} else if (c === "/" && src[i + 1] === "/") {
-			while (i + 1 < src.length && src[i + 1] !== "\n") i++;
-		} else if (c === "/" && src[i + 1] === "*") {
-			const e = src.indexOf("*/", i + 2);
-			i = e === -1 ? src.length : e + 1;
-			code += " ";
-			bare += " ";
-		} else {
-			if (`'"\``.includes(c)) [q, from] = [c, code.length];
-			code += c;
-			bare += c;
-		}
-	}
-	// before each place: how many brackets are open, and how many of them are parentheses
-	const depth = [], parens = [], open = [];
-	for (const c of bare.split("")) {
-		if ("})]".includes(c)) open.pop();
-		depth.push(open.length);
-		parens.push(open.filter((b) => b === "(").length);
-		if ("{([".includes(c)) open.push(c);
-	}
-	const names = new Set();
-	const top = /\b(const|let|var|function(?:\s*\*\s*|\s+)|class|enum|type|interface)\s*([A-Za-z_$][\w$]*)/g;
-	const key = /(?<=[{,;\n][ \t]*)(?:readonly\s+)?(['"]?)([A-Za-z_$][\w$]*)\1\??\s*:/g;
-	for (const m of bare.matchAll(top)) {
-		if (depth[m.index]) continue;
-		names.add(m[2]);
-		// the body of an enum or an interface, or the { } or [ ] a variable or type is set to
-		const opens = /enum|interface/.test(m[1]) ? /^[^=;{]*\{/ : /^(\s*:[^=;{]*)?\s*=\s*[{[]/;
-		const rest = !/function|class/.test(m[1]) && bare.slice(m.index + m[0].length).match(opens);
-		if (!rest) continue;
-		const at = m.index + m[0].length + rest[0].length - 1;
-		let end = at + 1;
-		while (end < bare.length && depth[end] > depth[at]) end++;
-		const body = code.slice(at, end);
-		if (m[1] === "enum") {
-			for (const part of body.slice(1).split(",")) names.add(part.match(/^\s*['"]?([A-Za-z_$][\w$]*)/)?.[1]);
-		} else {
-			for (const k of body.matchAll(key)) {
-				const i = at + k.index;
-				if (bare[i] === code[i] && parens[i] === parens[at]) names.add(k[2]);
-			}
-		}
-	}
-	const near = (i, step) => {
-		while (/\s/.test(bare[i] ?? "")) i += step;
-		return bare[i] === "|" && bare[i + step] !== "|" && (step < 0 || bare[i + 1] !== "=");
-	};
-	for (const s of strings) if (/^[A-Za-z_$][\w$]*$/.test(s.text) && (near(s.at - 1, -1) || near(s.end, 1))) names.add(s.text);
-	names.delete(undefined);
-	return names;
-};
 
 const lines = readLines(file);
 const field = (k) => {
@@ -191,7 +115,7 @@ for (const d of old ? readLines(old).map((l) => def(l, "")) : []) {
 let fence = false, sec = "", tier = 0, area = "", req = null, status = null, ledger = "";
 const defs = new Map(), qTier = new Map(), tierCount = [0, 0, 0], hasTier = [];
 const areas = [], areaLine = new Map(), confirm = new Map(), quotes = [];
-const sources = new Map(), refs = [], decidedBy = [], cited = [], prose = [];
+const sources = new Map(), refs = [], decidedBy = [], prose = [];
 const endReq = () => {
 	if (req && !req.scenario) fail(req.n, `${req.id} has no scenario: add a case under it`);
 	req = null;
@@ -229,7 +153,6 @@ lines.forEach((text, i) => {
 	if (area && POLICY.test(text)) quotes.push({ n, id: area, text });
 	const s = sec === "Sources" && text.match(/^- (S[0-9]+)\. /);
 	if (s) sources.set(s[1], firstPath(text.slice(2)));
-	if (s) for (const p of allPaths(text.slice(2))) cited.push({ sid: s[1], p });
 	if (LEDGER.test(text)) ledger += `\n${squeeze(text.replace(/^- [A-Za-z]+ "/, ""))}`;
 	const d = def(text, sec);
 	if (d) {
@@ -342,27 +265,7 @@ const checkQuotes = ({ n, id, text }) => {
 quotes.forEach(checkQuotes);
 listCut();
 
-// code names in prose: a backtick span, a path in the workspace, or a name a cited code file declares that is not a
-// plain word. A plain word is spelled as prose spells words (lowercase but for its first letter), is a currency code,
-// or is used outside backticks and fences in the intent, a cited text file, a text file in docs/ but not docs/specs/,
-// or the README.md or GLOSSARY.md at the root.
-const plain = new Set(Intl.supportedValuesOf("currency"));
-const readPlain = (f) => {
-	const t = fs.readFileSync(f, "utf8").replace(/^```[^]*?^```/gm, " ").replace(/`[^`\n]*`/g, " ");
-	for (const w of t.match(TOKEN) ?? []) plain.add(w);
-};
-const root = `${dir}/../..`;
-const isDir = (f) => fs.statSync(f, { throwIfNoEntry: false })?.isDirectory() ?? false;
-const docs = isDir(`${root}/docs`) ? fs.readdirSync(`${root}/docs`, { recursive: true }).map((f) => `docs/${f}`) : [];
-const others = docs.concat("README.md", "GLOSSARY.md").filter((f) => TEXT.test(f) && !f.startsWith("docs/specs/"));
-[intent, ...others.map((f) => `${root}/${f}`)].filter((f) => f && isFile(f)).forEach(readPlain);
-const declared = new Map();
-for (const { sid, p } of cited) {
-	const f = findFile(p);
-	if (!f) continue;
-	if (CODE.test(p)) for (const w of declares(fs.readFileSync(f, "utf8"))) declared.has(w) || declared.set(w, `${sid} (${p})`);
-	else if (TEXT.test(p)) readPlain(f);
-}
+// code names in prose: a backtick span, or a path in the workspace
 for (const { n, text } of prose) {
 	const seen = new Set();
 	for (const m of text.matchAll(/`([^`]+)`/g)) {
@@ -374,11 +277,6 @@ for (const { n, text } of prose) {
 		if (seen.has(w) || !/[A-Za-z]/.test(w) || !w.includes("/") || !roots.some((r) => fs.existsSync(`${r}/${w}`))) continue;
 		seen.add(w);
 		fail(n, `${w} is a path in the workspace: cite it as S<n> (Name), with the path under Sources`);
-	}
-	for (const w of rest.match(TOKEN) ?? []) {
-		if (seen.has(w) || !declared.has(w) || WORD.test(w) || plain.has(w)) continue;
-		seen.add(w);
-		fail(n, `${w} is a name the code in ${declared.get(w)} declares: ${PLAIN}`);
 	}
 }
 
