@@ -63,14 +63,14 @@ A requirement states only what is decided. It never says that a case or a requir
 
 ### 5. Write the spec
 
-Use the headings of [references/spec-template.md](references/spec-template.md) in order, filling its placeholders. Write in the intent's language, but keep headings, ids, field names, markers, and `None.` in English. In a spec not in English, translate faithfully the notes under What this work touches and Open questions, the four question labels (each still followed by a colon, the same in the note and on every question), the Sources summary, and the sentence for an area with no policy document.
+Use the headings of [references/spec-template.md](references/spec-template.md) in order, filling its placeholders. Write in the intent's language, but keep headings, ids, field names, markers, and `None.` in English. In a spec not in English, translate faithfully the notes under What this work touches and Open questions, the four question labels, the Sources summary, and the sentence for an area with no policy document.
 
 - **Requirements**: one behavior someone outside can check per requirement. Quote a message's exact wording only when someone decided it or depends on it; otherwise give its meaning. Each "then" names a value, a state, a message's meaning, or what the observer can do next. Where the intent says a behavior follows a policy, say so in its words and leave what the policy gives to the area's question.
 - **Changes to existing behavior**: one row per behavior in use that changes, pointing to a requirement when it needs scenarios.
 - **What this work touches**: the template's note, translated in a spec not in English, then the areas grouped by role.
 - **Constraints**: only limits of a system or contract, or set by the intent, that this work could break.
 - **Open questions**: the template's note, then the questions. Keep each line to a sentence or two. "To resolve" names the concrete decision or check, not just "choose a or b". A question of fact gives what each likely result builds.
-- **Sources**: an appendix for engineers, folded so other readers pass it by. Keep the template's `<details>` lines and the blank lines around the list.
+- **Sources**: an appendix for engineers, folded so other readers pass it by.
 
 Ids are stable within a spec and across one that supersedes it: never renumber; a removed item leaves a gap. Cite an item by id and current name, as in `R2 (Weekly limit)`.
 
@@ -78,13 +78,13 @@ Then trace each "must" sentence in Requirements and Changes to existing behavior
 
 ### 6. Check the form
 
-Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>` and fix what it prints until it prints nothing. If a line is wrong about the spec, don't change correct text to silence it; say so in your final message. If you can't run it, do the checks listed at its top by hand.
+Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>` and fix what it prints until it prints only "not verified" lines. Passing means its references and quotes resolve, not that the spec is good. If a line is wrong about the spec, don't change correct text to silence it; say so in your final message.
 
 ### 7. Check with a fresh reader
 
 You can't run the spec's test yourself: you fill gaps from what you read without noticing. Once per draft, give spec.md and the intent, and nothing else, to one fresh subagent, on a different model when one is available, with this request:
 
-> You will build from this spec and can't ask anyone. List at most 10 findings, most important first, each with its R, A, C, or Q id: a choice you would make yourself that a user, a stakeholder, or another system would notice, with literal values and what each would see; a quoted sentence deciding something the intent does not, with no marker or named item behind it; a requirement that applies, reads, or works out a policy or law instead of leaving it to its area's question; or a change to personal data, money, notices, access, or records that "What this work touches" leaves out. Don't list what an open question already asks, unless another sentence answers it. Leave out how to build it and failures nobody outside sees.
+> You will build from this spec and can't ask anyone. List at most 10 findings, most important first, each with its R, A, C, or Q id: a choice you would make yourself that a user, a stakeholder, or another system would notice, with literal values and what each would see; a quoted sentence deciding something the intent does not, with no marker or named item behind it; a sentence outside Open questions that settles a value an open question asks about; a requirement that applies, reads, or works out a policy or law instead of leaving it to its area's question; or a change to personal data, money, notices, access, or records that "What this work touches" leaves out. Don't list what an open question already asks, unless another sentence answers it. Leave out how to build it and failures nobody outside sees.
 
 Sort each finding:
 
@@ -98,4 +98,4 @@ Don't ask a second reader. Run step 6 again, then re-read each line you changed 
 
 Save in the workspace's `docs/specs/`, the one closest to the intent if there are several, or a new one next to its `docs/intents/`; a superseding spec goes in the earlier spec's directory. Name it `NNNN-<slug>.md`: the next unused four-digit number there, from `0001`, and a short kebab-case English slug. A superseding spec fills in `Supersedes`. Change no other file, the earlier spec included. If you can't write the file, give the spec in your reply.
 
-End with a short message: the spec's path and Status line, then each role that has questions, with their ids and short names in the spec's order. Do not write the plan.
+End with a short message: the spec's path and Status line, then each role that has questions, with their ids and short names in the spec's order, and any quote check-spec could not verify. Never cite its passing as evidence of quality. Do not write the plan.

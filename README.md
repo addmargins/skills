@@ -42,6 +42,7 @@ Restart Claude Code to apply an update.
 
 - `skills/engineering/<skill>/SKILL.md`: the skill definitions.
 - `.claude-plugin/marketplace.json`: makes this repo a Claude Code plugin marketplace with one plugin, `addmargins`.
+- `tests/<skill>/`: regression tests for a skill's scripts, kept outside `skills/` so no skill loads them. Run `sh tests/write-spec/run.sh` after changing `write-spec`'s `check-spec.sh`.
 
 ## Adding a skill
 
