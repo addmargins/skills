@@ -78,13 +78,13 @@ Then trace each "must" sentence in Requirements and Changes to existing behavior
 
 ### 6. Check the form
 
-Run `sh <this skill's directory>/scripts/check-spec.sh <spec file>` and fix what it prints until it prints only "not verified" lines. Passing means its references and quotes resolve, not that the spec is good. If a line is wrong about the spec, don't change correct text to silence it; say so in your final message.
+Run `node <this skill's directory>/scripts/check-spec.mjs <spec file>` and fix what it prints until it prints only "not verified" lines. Passing means its ids, references, counts, and quotes resolve, not that the spec is good. If a line is wrong about the spec, don't change correct text to silence it; say so in your final message. If node is not installed, say in your final message that the check did not run, never that it passed.
 
 ### 7. Check with a fresh reader
 
 You can't run the spec's test yourself: you fill gaps from what you read without noticing. Once per draft, give spec.md and the intent, and nothing else, to one fresh subagent, on a different model when one is available, with this request:
 
-> You will build from this spec and can't ask anyone. List at most 10 findings, most important first, each with its R, A, C, or Q id: a choice you would make yourself that a user, a stakeholder, or another system would notice, with literal values and what each would see; a quoted sentence deciding something the intent does not, with no marker or named item behind it; a sentence outside Open questions that settles a value an open question asks about; a requirement that applies, reads, or works out a policy or law instead of leaving it to its area's question; or a change to personal data, money, notices, access, or records that "What this work touches" leaves out. Don't list what an open question already asks, unless another sentence answers it. Leave out how to build it and failures nobody outside sees.
+> You will build from this spec and can't ask anyone. List at most 10 findings, most important first, each with its R, A, C, or Q id: a choice you would make yourself that a user, a stakeholder, or another system would notice, with literal values and what each would see; a quoted sentence deciding something the intent does not, with no marker or named item behind it; a sentence outside Open questions that settles a value an open question asks about, including one that puts a case on one side of that value, as "under", "within", "up to", or "or more" do, where no source the spec quotes says which side; a requirement that applies, reads, or works out a policy or law instead of leaving it to its area's question; or a change to personal data, money, notices, access, or records that "What this work touches" leaves out. Don't list what an open question already asks, unless another sentence answers it. Leave out how to build it and failures nobody outside sees.
 
 Sort each finding:
 
