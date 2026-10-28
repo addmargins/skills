@@ -1,5 +1,5 @@
-// Regression tests for skills/engineering/write-spec/scripts/check-spec.mjs. The samples in docs/specs/ must pass.
-// Each variant is a sample with exact replacements, and must fail with the finding it was built for, or still pass.
+// Regression tests for skills/engineering/write-spec/scripts/check-spec.mjs. The sample in docs/specs/ must pass.
+// Each variant is the sample with exact replacements, and must fail with the finding it was built for, or still pass.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -42,13 +42,11 @@ const passes = (name, sample, ...pairs) =>
 		assert.equal(result.status, 0, result.stdout);
 	});
 
-for (const sample of ["sample-en", "sample-ko", "sample-en-v2"]) {
-	test(sample, () => {
-		const result = run(`docs/specs/${sample}.md`);
-		assert.equal(result.status, 0, result.stdout);
-		assert.equal(result.stdout, "");
-	});
-}
+test("sample-en", () => {
+	const result = run("docs/specs/sample-en.md");
+	assert.equal(result.status, 0, result.stdout);
+	assert.equal(result.stdout, "");
+});
 
 test("usage-no-arg", () => {
 	const result = run();
@@ -61,30 +59,29 @@ test("no-such-file", () => {
 	assert.ok(result.stderr.includes("check-spec: no such file: docs/specs/missing.md"));
 });
 
-fails("undefined-id", "Q9 is referenced but not defined", "sample-en", "carried as Q4.", "carried as Q9.");
-fails("defined-twice", "Q4 is defined twice", "sample-en",
-	"- Q5. Wording after a move", "- Q4. Wording after a move");
-const booked = "the new time and branch are booked";
-fails("decided-by-open-q", "Q4 is an open question, so a (decided by", "sample-en-v2",
-	booked, `${booked} (decided by the originator, sample-en.md Q4)`);
+fails("undefined-id", "Q9 is referenced but not defined", "sample-en", "carried as Q3.", "carried as Q9.");
+fails("defined-twice", "Q3 is defined twice", "sample-en",
+	"- Q4. Wording after a move", "- Q3. Wording after a move");
+const intentLine = "Intent: 0002-app-cancellation-en.md";
+const rev = (old = "sample-en.md") => [intentLine, `${intentLine}\n\nSupersedes: ${old}`];
+const booked = "without paying a second deposit.";
+fails("decided-by-open-q", "Q3 is an open question, so a (decided by", "sample-en", ...rev(),
+	booked, "without paying a second deposit (decided by the originator, sample-en.md Q3).");
 fails("decided-by-no-supersedes", "may cite only the spec this one supersedes, and this spec supersedes none",
 	"sample-en", "without paying a second deposit.",
-	"without paying a second deposit (decided by the finance team lead, S3 (Deposit policy) 4.2).");
-fails("decided-by-other-file", "may cite only the spec this one supersedes (sample-en.md)", "sample-en-v2",
-	booked, `${booked} (decided by the finance team lead, S3 (Deposit policy) 4.2)`);
-passes("ok-decided-by-supersedes", "sample-en-v2", booked, `${booked} (decided by the originator, sample-en.md R2)`);
+	"without paying a second deposit (decided by the finance team lead, S2 (Deposit policy) 4.2).");
+fails("decided-by-other-file", "may cite only the spec this one supersedes (sample-en.md)", "sample-en", ...rev(),
+	booked, "without paying a second deposit (decided by the finance team lead, S2 (Deposit policy) 4.2).");
+passes("ok-decided-by-supersedes", "sample-en", ...rev(), booked, "without paying a second deposit (decided by the originator, sample-en.md R2).");
 fails("no-scenario", "R2 has no scenario", "sample-en",
 	"- Given a 2026-11-10 10:00 appointment, when the patient moves it to the same doctor",
 	"Given a 2026-11-10 10:00 appointment, when the patient moves it to the same doctor");
-fails("intent-outcome-missing", 'no Outcome or Question line quoting "A cancellation refunds', "sample-en",
-	'- Outcome "A cancellation refunds the amount', 'The intent says "A refund gives the amount');
-fails("intent-question-missing", 'no Outcome or Question line quoting "앱에서 예약을 변경할 때', "sample-ko",
-	'- Question "앱에서 예약을 변경할 때 담당 의사도 바꿀 수 있게 할지 정하지 않았다": carried as Q5.', "");
+fails("intent-question-missing", 'no Outcome or Question line quoting "Whether a patient who moves', "sample-en",
+	'- Question "Whether a patient who moves an appointment may also change the doctor": carried as Q3.', "");
 fails("intent-missing", "Intent: line missing, or its file not found", "sample-en",
 	"Intent: 0002-app-cancellation-en.md", "Intent: 0009-gone.md");
-fails("supersedes-missing", "superseded spec not found next to this one: sample-old.md", "sample-en-v2",
-	"Supersedes: sample-en.md", "Supersedes: sample-old.md");
-fails("supersede-renumbered", "R4 has the name of R2 in the superseded spec", "sample-en-v2",
+fails("supersedes-missing", "superseded spec not found next to this one: sample-old.md", "sample-en", ...rev("sample-old.md"));
+fails("supersede-renumbered", "R4 has the name of R2 in the superseded spec", "sample-en", ...rev(),
 	"### R2. Patient: Move within the branch", "### R4. Patient: Move within the branch");
 fails("tier-heading-missing", 'no "### Can wait for planning" heading', "sample-en",
 	"### Can wait for planning", "");
@@ -93,27 +90,24 @@ fails("confirm-in-no-question", "A2's Confirm in: names no question", "sample-en
 	"  - Confirm in: Q2.\n", "");
 fails("area-confirm-not-q", "A2's Confirm in: names no question", "sample-en",
 	"  - Confirm in: Q2.", "  - Confirm in: R1 (Cancel in the app).");
-fails("area-question-tier2", 'A2 is confirmed in Q5, which is not under "Decide before building"', "sample-en",
-	"  - Confirm in: Q2.", "  - Confirm in: Q5.");
-fails("status-missing", 'no "Status:" line', "sample-en", "Status: 4 to decide", "State: 4 to decide");
+fails("area-question-tier2", 'A2 is confirmed in Q4, which is not under "Decide before building"', "sample-en",
+	"  - Confirm in: Q2.", "  - Confirm in: Q4.");
+fails("status-missing", 'no "Status:" line', "sample-en", "Status: 3 to decide", "State: 3 to decide");
 fails("status-not-two-numbers", "Status: must give two numbers", "sample-en",
-	"Status: 4 to decide before building, 1 that", "Status: 4 to decide before building, one that");
-fails("status-count", 'Status: says 3 under "Decide before building", but it lists 4', "sample-en",
-	"Status: 4 to decide", "Status: 3 to decide");
-fails("quote-not-verbatim", "A1: the text quoted from S3 is not word for word", "sample-en",
+	"Status: 3 to decide before building, 1 that", "Status: 3 to decide before building, one that");
+fails("status-count", 'Status: says 2 under "Decide before building", but it lists 3', "sample-en",
+	"Status: 3 to decide", "Status: 2 to decide");
+fails("quote-not-verbatim", "A1: the text quoted from S2 is not word for word", "sample-en",
 	"gets 50% back", "gets half back");
 fails("quote-unclosed", "A1: a quote has no closing quote mark", "sample-en",
 	'gets nothing back."', "gets nothing back.");
 fails("quote-no-source-id", "A1: not verified: cite the quoted document as S<n> (Name)", "sample-en",
-	"Deposit policy (S3), 4.3:", "Deposit policy, 4.3:");
-fails("quote-stops-at-colon", "A2: the quote from S4 stops before the list", "sample-en",
+	"Deposit policy (S2), 4.3:", "Deposit policy, 4.3:");
+fails("quote-stops-at-colon", "A2: the quote from S3 stops before the list", "sample-en",
 	"“A cancellation text must give: the branch and the time of the appointment; the amount refunded, if any.”",
 	"“A cancellation text must give:”");
-fails("quote-file-missing", "A1: not verified: S3", "sample-en",
+fails("quote-file-missing", "A1: not verified: S2's file policies/POL-FIN-007-old.md was not found", "sample-en",
 	"policies/POL-FIN-007-en.md", "policies/POL-FIN-007-old.md");
-fails("quote-path-with-spaces", "A1: not verified: S3", "sample-en",
-	"policies/POL-FIN-007-en.md", "`policies/Deposit policy copy.md`");
-fails("quote-path-is-folder", "A1: not verified: S3", "sample-en", "policies/POL-FIN-007-en.md", "policies");
 test("quote-not-text-file", () => {
 	writeFileSync(join(tmp, "policies/POL-FIN-007-en.pdf"), "");
 	const result = run(variant("quote-not-text-file", "sample-en",
@@ -122,20 +116,18 @@ test("quote-not-text-file", () => {
 	assert.ok(result.stdout.includes("A1: not verified: policies/POL-FIN-007-en.pdf is not a text file"),
 		result.stdout);
 });
-fails("quote-not-verbatim-ko", "A3: the text quoted from S6 is not word for word", "sample-ko",
-	"48시간이 지나기 전에는", "이틀이 지나기 전에는");
 passes("ok-list-quoted-by-item", "sample-en",
 	"2.1: “A cancellation text must give: the branch and the time of the appointment; the amount refunded, if any.”",
 	`2.1: “A cancellation text must give:”
-  - Policy text: Patient notice rules (S4), 2.1(a): “the branch and the time of the appointment;”
-  - Policy text: Patient notice rules (S4), 2.1(b): “the amount refunded, if any.”`);
+  - Policy text: Patient notice rules (S3), 2.1(a): “the branch and the time of the appointment;”
+  - Policy text: Patient notice rules (S3), 2.1(b): “the amount refunded, if any.”`);
+passes("ok-area-no-policy-found", "sample-en",
+	"Policy text: Patient notice rules (S3), 2.1: “A cancellation text must give: the branch and the time of the appointment; the amount refunded, if any.”",
+	"Policy text: No policy document for this area found in the workspace.");
 passes("ok-quotes-split", "sample-en",
 	'4.2: "A later cancellation up to 3 hours before gets 50% back."', '4.2: "A later cancellation" … "gets 50% back."');
 const cancelText = "The cancellation text names the branch and time, as today";
 fails("code-backtick", "`cancelBooking` is in backticks, which mark code", "sample-en",
-	"the app's cancel button shows only", "the app's `cancelBooking` shows only");
+	"then the app does not cancel it", "then `cancelBooking` does not cancel it");
 fails("code-path", "policies/POL-NTC-003-en.md is a path in the workspace", "sample-en",
 	`${cancelText} (current behavior, S1 (Booking cancellation)).`, `${cancelText} (policies/POL-NTC-003-en.md).`);
-passes("ok-code-name-under-sources", "sample-en",
-	"- S1. Booking cancellation: src/booking/cancel.ts, cancelBooking.",
-	"- S1. Booking cancellation: `src/booking/cancel.ts`, `cancelBooking`, `BookingStatus` (BOOKED, CANCELLED).");

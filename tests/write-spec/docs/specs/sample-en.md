@@ -2,16 +2,15 @@
 
 Intent: 0002-app-cancellation-en.md
 
-Status: 4 to decide before building, 1 that can wait for planning.
+Status: 3 to decide before building, 1 that can wait for planning.
 
 ## Summary
 Today a patient who paid a deposit in the app must phone to cancel, and desk staff work out the refund by hand. Patients will be able to cancel in the app up to 3 hours before the appointment and get the deposit policy's refund with no staff input (R1), or move it within the same branch and department (R2).
 
 ## Roles
 - Originator (head of customer experience): the problem is solved; From the intent.
-- Finance team lead, or whoever owns the deposit and refund policy: A1, and the refund route in Q3.
+- Finance team lead, or whoever owns the deposit and refund policy: A1.
 - Owner of patient notice rules, or whoever approves what patients are told about money: A2.
-- Technical lead for payments: C1 and the fact it rests on.
 - Product owner for the booking app, or whoever decides its behavior: scope, and product behavior no other role decides.
 
 ## Requirements
@@ -37,27 +36,21 @@ Policies or laws commonly govern each area below that this work changes. The rol
 ### Finance team lead, or whoever owns the deposit and refund policy
 - A1. Deposit refunds made by the app
   - Affects: R1 (Cancel in the app).
-  - Policy text: Deposit policy (S3), 4.1: "A cancellation up to one day before the appointment gets the whole deposit back."
-  - Policy text: Deposit policy (S3), 4.2: "A later cancellation up to 3 hours before gets 50% back."
-  - Policy text: Deposit policy (S3), 4.3: "A cancellation after that gets nothing back."
+  - Policy text: Deposit policy (S2), 4.1: "A cancellation up to one day before the appointment gets the whole deposit back."
+  - Policy text: Deposit policy (S2), 4.2: "A later cancellation up to 3 hours before gets 50% back."
+  - Policy text: Deposit policy (S2), 4.3: "A cancellation after that gets nothing back."
   - Confirm in: Q1.
 
 ### Owner of patient notice rules, or whoever approves what patients are told about money
 - A2. Messages to patients about a cancellation
   - Affects: R1 (Cancel in the app).
-  - Policy text: Patient notice rules (S4), 2.1: “A cancellation text must give: the branch and the time of the appointment; the amount refunded, if any.”
+  - Policy text: Patient notice rules (S3), 2.1: “A cancellation text must give: the branch and the time of the appointment; the amount refunded, if any.”
   - Confirm in: Q2.
-
-## Constraints
-- C1. Card refund window: a card payment older than 60 days cannot be refunded through NuriPay. Type: limit (payment contract). Source: claimed in S2 (NuriPay connection), not verified. Owner: technical lead for payments.
-
-## Out of scope
-- Moving to another branch or department (intent).
 
 ## From the intent
 - Outcome "A patient can cancel or move their own appointment in the app without calling": R1 (Cancel in the app), R2 (Move within the branch).
 - Outcome "A cancellation refunds the amount the deposit policy (`docs/policies/deposit-and-no-show-fee.md`) gives, with no staff input": R1 (Cancel in the app), with the amount confirmed in Q1.
-- Question "Whether a patient who moves an appointment may also change the doctor": carried as Q4.
+- Question "Whether a patient who moves an appointment may also change the doctor": carried as Q3.
 
 ## Open questions
 Everything outside these questions is decided. Those under "Decide before building" leave open a case, a step, or who qualifies, so they are answered before building starts. Those under "Can wait for planning" only fill a value, a wording, a label, or a format, which the plan leaves blank and fills before release. The role under "Who answers" decides; anyone may settle a fact by checking.
@@ -73,19 +66,14 @@ Everything outside these questions is decided. Those under "Decide before buildi
   - Depends on the answer: what R1 (Cancel in the app) shows before and after a cancellation, and what its text says.
   - To resolve: the role names the governing rules; the clause quoted under A2 is a lead.
   - Who answers: owner of patient notice rules, or whoever approves what patients are told about money.
-- Q3. Refunds past the card window
-  - What is unclear: how a patient is refunded when C1 (Card refund window) blocks the card refund, as for an appointment paid on 2026-08-20 for 2026-11-15 and cancelled on 2026-11-12, 84 days after payment.
-  - Depends on the answer: a bank transfer adds an account step to R1 (Cancel in the app); sending the patient to the desk narrows R1 to payments within 60 days.
-  - To resolve: finance decides the refund route; whether the 60-day limit is real must be checked in the NuriPay contract, which is not in the workspace.
-  - Who answers: finance team lead, or whoever owns the deposit and refund policy (decides); technical lead for payments (checks the limit).
-- Q4. Changing the doctor when moving
+- Q3. Changing the doctor when moving
   - What is unclear: whether a move may switch to another doctor in the same department.
   - Depends on the answer: with a, R2 (Move within the branch) shows only the same doctor's slots; with b, it also shows other doctors' slots and a doctor choice.
   - To resolve: decide whether a move may change the doctor; the intent offers a and b.
   - Who answers: originator (head of customer experience).
 
 ### Can wait for planning
-- Q5. Wording after a move
+- Q4. Wording after a move
   - What is unclear: the wording of the confirmation R2 (Move within the branch) shows once the new time is booked.
   - Depends on the answer: only the text on that screen.
   - To resolve: write the wording.
@@ -95,8 +83,7 @@ Everything outside these questions is decided. Those under "Decide before buildi
 <details><summary>For engineers: where each cited fact was read (other readers can skip)</summary>
 
 - S1. Booking cancellation: src/booking/cancel.ts, cancelBooking.
-- S2. NuriPay connection: src/payments/nuripay.ts, header comment.
-- S3. Deposit policy: policies/POL-FIN-007-en.md, section 4.
-- S4. Patient notice rules: `policies/POL-NTC-003-en.md`, clause 2.1.
+- S2. Deposit policy: policies/POL-FIN-007-en.md, section 4.
+- S3. Patient notice rules: `policies/POL-NTC-003-en.md`, clause 2.1.
 
 </details>
