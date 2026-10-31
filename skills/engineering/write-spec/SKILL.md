@@ -19,32 +19,13 @@ Most of these roles are not engineers. Each role must be able to find and review
 - a product behavior that nobody has decided; or
 - how a policy or a law applies.
 
-Each such gap becomes an open question for the role that decides it.
+Each such missing decision is a gap. Each gap becomes an open question for the role that decides it.
 
 This skill often runs as an automated job, with nobody to ask. Even when a person starts it, that person is rarely the one who decides. So:
 
 - Do not ask anyone anything while you draft.
 - Treat as decided only what a source decides, as Principle 1 says. Everything else becomes an open question. This run does not answer the open questions.
 - The skill ends when the spec is saved.
-
-## Terms used in this skill
-
-- **Intent**: the accepted intent document that the spec is built from.
-- **Source**: a workspace file you read, such as the intent, an earlier spec, an ADR, a glossary, a policy document, or code.
-- **Role**: a responsibility, such as "finance team lead". A role is never a person's name.
-- **Originator**: the role that raised the intent.
-- **Builder**: whoever later builds from the spec.
-- **Actor**: a person who uses or runs the product and sees its behavior.
-- **Gap**: a choice that a builder would otherwise make alone, and that a user, a stakeholder, or another system would notice.
-- **Item**: anything in the spec with an id: R (requirement), A (area), C (constraint), Q (open question), S (source).
-- **Supersede**: replace. A spec supersedes an earlier spec when it replaces it.
-- **Area**: a place where this work changes something that policies or laws commonly govern, such as personal data or refunds (step 3).
-- **Open question**: a decision or a fact that the spec leaves open, for one role to answer (step 4). A **question of fact** asks what is true, not what to decide.
-- **Tier**: each open question is in one of two tiers, "Decide before building" or "Can wait for planning" (step 4).
-- **Slot**: a blank in a requirement that the answer to an open question fills in, such as "the refund that Q3 sets".
-- **Marker**: a note in parentheses at the end of a sentence that says where the sentence comes from (Principle 1).
-- **Current behavior**: what the existing system does today, as you saw it in the code.
-- **Plan**: the engineering document, written later, that says how to build the spec. This skill does not write it.
 
 ## Principles
 
@@ -54,11 +35,11 @@ This skill often runs as an automated job, with nobody to ask. Even when a perso
   - the intent;
   - a workspace source that is not a policy or a law;
   - the role that decides it, through an open question.
-- A value that a policy sets appears in one place only: quoted on the "Policy text" line of its area. In Requirements, Changes to existing behavior, and Constraints, do not write the value. Name the question that sets it instead, for example "the refund that Q3 sets".
-- Mark each decision that does not come from the intent. Put the marker at the end of the sentence. There are two markers:
+- A value that a policy sets appears in one place only: quoted on the "Policy text" line of its area (step 3). In Requirements, Changes to existing behavior, and Constraints, do not write the value. Name the question that sets it instead, for example "the refund that Q3 sets".
+- Mark each decision that does not come from the intent with a marker: a source note in parentheses at the end of the sentence. There are two markers:
   - `(decided by <role>, <file>)`: only for a decision recorded in the earlier spec that this spec supersedes.
   - `(current behavior, S<n> (Name))`: for existing behavior that you checked yourself.
-- A marker covers the whole sentence it ends. A sentence that names the item it follows from needs no marker, for example "the amount Q1 sets" or "as S4 (Data retention decision) records". An S item named this way is never a policy or a law.
+- A marker covers the whole sentence it ends. A sentence that names the item (an R, A, C, Q, or S entry) it follows from needs no marker, for example "the amount Q1 sets" or "as S4 (Data retention decision) records". An S item named this way is never a policy or a law.
 - If you draw a new boundary inside a decision that someone recorded, the boundary is a new open question.
 - Write each value in its source's words: "a threshold of 50", not "under 50" or "within 50". Words such as "under" decide which side of the value a case falls on. Use them only if the source says which side.
 - A value that you would suggest is not a decision. It may appear only as a likely answer to a question.
@@ -71,14 +52,14 @@ You may read and quote policies and laws. But only the roles that own them say w
 - Read the workspace to learn how things work today: ADRs, a `GLOSSARY.md`, policy documents, the code.
 - Cite current behavior only for what you saw the code do, in the same case the sentence is about.
 - In prose, name code in plain words ("booked", not BOOKED), and cite it as S<n> (Name). Code names appear only under Sources.
-- Ask a question of fact only when you could not check the fact yourself. In the question, say why you could not.
+- Ask a question of fact (about what is true, not about what to decide) only when you could not check the fact yourself. In the question, say why you could not.
 - A fact you give to a decider is either computed from the workspace, or it says what it depends on. Never write "most" unless you counted.
 - Which policies or laws apply, and what they require, is for the roles that own them to say (step 3).
 
 ### 3. What, not how
 
-- The spec states what an actor or another system can observe, and the limits the work must stay within.
-- Modules, files, types, and algorithms belong to the plan.
+- The spec states what an actor (a person who uses or runs the product) or another system can observe, and the limits the work must stay within.
+- Modules, files, types, and algorithms belong to the plan: the later document that says how to build. This skill does not write it.
 - Define an exact interface or data format only when someone outside this build depends on it. Then say what it is for, and give a sample or a link to its schema.
 - Write a lifecycle as a table with four columns: state, event, next state, and who sees what.
 
@@ -113,7 +94,7 @@ You may read and quote policies and laws. But only the roles that own them say w
 
 ### 2. Find the gaps
 
-Draft the requirements in your head. For each one, list its gaps. These prompts give ideas; they are not a checklist:
+A gap is a choice that a builder would otherwise make alone, and that a user, a stakeholder, or another system would notice. Draft the requirements in your head. For each one, list its gaps. These prompts give ideas; they are not a checklist:
 
 - scope boundaries that a reader might expect to be covered;
 - values, defaults, limits, and thresholds: the behavior on each side of each one, and when there is none at all, such as no permission;
@@ -163,7 +144,7 @@ If two areas or two quotes bear on one requirement, state that as a fact, with n
 |---|---|
 | An area | The role that owns its rules, such as "privacy officer, or whoever approves new personal data collection", or the owner that a quoted document names |
 | A design limit, or a fact that only an engineer can check | The technical lead for that system |
-| What counts as solving the problem, including vague words in the outcome and the intent's own open questions | The originator |
+| What counts as solving the problem, including vague words in the outcome and the intent's own open questions | The originator: the role that raised the intent |
 | A case inside the work of another team, such as support or finance | The role that runs that team's work |
 | Any other product behavior | Whoever decides the product's behavior |
 
@@ -174,7 +155,7 @@ If two areas or two quotes bear on one requirement, state that as a fact, with n
 
 - **Area questions.** Each role gets one question for all of its areas. The question has one numbered part per area, by its A id. Each part asks which policies or laws apply, and what they require. Only area questions combine different subjects in this way.
 - No question restates a clause or cites it by number, because the area already quotes it.
-- **Other questions.** Each question asks for one decision. Exception: when one role decides several things about one subject (a screen, a message, a record, or a case) in one tier, make one question with numbered parts. Each part has its own likely answers. Example: "Receipt after a refund: 1. who gets it (a. the payer; b. the account holder); 2. whether it gives the reason (a. yes; b. no)".
+- **Other questions.** Each question asks for one decision. Exception: when one role decides several things about one subject (a screen, a message, a record, or a case) in one tier (see Tiers below), make one question with numbered parts. Each part has its own likely answers. Example: "Receipt after a refund: 1. who gets it (a. the payer; b. the account holder); 2. whether it gives the reason (a. yes; b. no)".
 - Each numbered part names its own case, and what changes for that case. Never fold one case into a broader part.
 - Never put different subjects, different roles, or different tiers into one question.
 - For a choice, give two to four likely answers, lettered a, b, c, d, each with its trade-offs. Do not recommend any of them.
@@ -189,7 +170,7 @@ If two areas or two quotes bear on one requirement, state that as a fact, with n
 **Requirements and open questions.**
 
 - A requirement states only what is decided. It never says that a case or a requirement is delayed, turned off, or on hold. Every "Decide before building" question is answered before building starts.
-- A requirement names a question only where the answer fills a slot in it.
+- A requirement names a question only where the answer fills a blank in it, as in "the refund that Q3 sets".
 - If every likely answer to a question would build the same thing, it is not a gap. Do not ask it.
 - Keep the number of questions low by checking facts yourself and by combining questions as described above. Never do it by leaving out a gap or an area.
 

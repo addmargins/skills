@@ -53,7 +53,7 @@ Everything outside these questions is decided. Questions under "Decide before bu
 <First each role's area question, then each question that leaves open a case, a step, who qualifies, or a behavior. If there are none, write "None.".>
 
 - Q1. <Short name>
-  - What is unclear: <One sentence that names the open case or slot. For several parts about one subject: "1. <case>: <what changes for it>; 2. …", one case per part. For a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require". Give no clause number or quote.>
+  - What is unclear: <One sentence that names the open case or blank. For several parts about one subject: "1. <case>: <what changes for it>; 2. …", one case per part. For a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require". Give no clause number or quote.>
   - Depends on the answer: <For each likely answer: which R or C items change, and how. For areas: the requirements under each area's Affects.>
   - To resolve: <The concrete decision or check that settles it. For a decision: what the decider fixes, such as "who receives the receipt after a refund". For a fact: the record to check, where it is, and why it was not checked here. For areas: the role names the rules that govern each area, and confirms or corrects its quotes. Never only "choose a or b".>
   - Who answers: <The role, as named under Roles. For an area question: the role in the area's ### heading under What this work touches.>
