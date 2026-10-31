@@ -24,7 +24,7 @@ Each such gap becomes an open question for the role that decides it.
 This skill often runs as an automated job, with nobody to ask. Even when a person starts it, that person is rarely the one who decides. So:
 
 - Do not ask anyone anything while you draft.
-- Write as decided only what the sources decide. Everything else becomes an open question. This run does not answer the open questions.
+- Treat as decided only what a source decides, as Principle 1 says. Everything else becomes an open question. This run does not answer the open questions.
 - The skill ends when the spec is saved.
 
 ## Terms used in this skill
@@ -34,12 +34,12 @@ This skill often runs as an automated job, with nobody to ask. Even when a perso
 - **Role**: a responsibility, such as "finance team lead". A role is never a person's name.
 - **Originator**: the role that raised the intent.
 - **Builder**: whoever later builds from the spec.
-- **Actor**: a person, or another system, that uses the product and sees its behavior.
+- **Actor**: a person who uses or runs the product and sees its behavior.
 - **Gap**: a choice that a builder would otherwise make alone, and that a user, a stakeholder, or another system would notice.
 - **Item**: anything in the spec with an id: R (requirement), A (area), C (constraint), Q (open question), S (source).
 - **Supersede**: replace. A spec supersedes an earlier spec when it replaces it.
-- **Area**: a part of the work that policies or laws often govern, such as personal data or refunds (step 3).
-- **Open question**: a decision or a fact that the spec leaves open, for one role to answer (step 4). A **question of fact** asks what is true today, not what to decide.
+- **Area**: a place where this work changes something that policies or laws commonly govern, such as personal data or refunds (step 3).
+- **Open question**: a decision or a fact that the spec leaves open, for one role to answer (step 4). A **question of fact** asks what is true, not what to decide.
 - **Tier**: each open question is in one of two tiers, "Decide before building" or "Can wait for planning" (step 4).
 - **Slot**: a blank in a requirement that the answer to an open question fills in, such as "the refund that Q3 sets".
 - **Marker**: a note in parentheses at the end of a sentence that says where the sentence comes from (Principle 1).
@@ -58,7 +58,7 @@ This skill often runs as an automated job, with nobody to ask. Even when a perso
 - Mark each decision that does not come from the intent. Put the marker at the end of the sentence. There are two markers:
   - `(decided by <role>, <file>)`: only for a decision recorded in the earlier spec that this spec supersedes.
   - `(current behavior, S<n> (Name))`: for existing behavior that you checked yourself.
-- A marker covers the whole sentence it ends. A sentence that names the item it follows from needs no marker, for example "the amount Q1 sets" or "as S4 (Data retention decision) records".
+- A marker covers the whole sentence it ends. A sentence that names the item it follows from needs no marker, for example "the amount Q1 sets" or "as S4 (Data retention decision) records". An S item named this way is never a policy or a law.
 - If you draw a new boundary inside a decision that someone recorded, the boundary is a new open question.
 - Write each value in its source's words: "a threshold of 50", not "under 50" or "within 50". Words such as "under" decide which side of the value a case falls on. Use them only if the source says which side.
 - A value that you would suggest is not a decision. It may appear only as a likely answer to a question.
@@ -77,7 +77,7 @@ You may read and quote policies and laws. But only the roles that own them say w
 
 ### 3. What, not how
 
-- The spec states what a person (an actor) or another system can observe, and the limits the work must stay within.
+- The spec states what an actor or another system can observe, and the limits the work must stay within.
 - Modules, files, types, and algorithms belong to the plan.
 - Define an exact interface or data format only when someone outside this build depends on it. Then say what it is for, and give a sample or a link to its schema.
 - Write a lifecycle as a table with four columns: state, event, next state, and who sees what.
@@ -121,7 +121,7 @@ Draft the requirements in your head. For each one, list its gaps. These prompts 
 - which inputs count as each action; which record or object an input means when more than one fits; what each actor sees or receives afterwards, including nothing;
 - the same person acting again, or undoing their action; a record that is corrected after someone was already told about it;
 - a message that promises that a person will do something: who, what they will see, and by when;
-- what each actor sees when something the work depends on fails; what happens to things that are in progress at go-live;
+- what each actor sees when something the work depends on fails, and what they see for things that are in progress at go-live;
 - existing users, records, and integrations: what each one sees change;
 - a limit of a system or a contract that the work could break.
 
@@ -145,7 +145,7 @@ For each area:
 - Name the requirements it affects.
 - Name the role that confirms which policies or laws apply and what they require.
 - Quote each clause of a workspace document that may govern the area, word for word, with its number. A quote is only a starting point for that role. It is not your reading of the clause.
-- If you find no such clause, write: "No policy document for this area found in the workspace." Never write that no policy applies.
+- If you find no such clause, write this sentence on the area's Policy text line, without quote marks: No policy document for this area found in the workspace. Never write that no policy applies.
 
 Never do any of these:
 
@@ -168,11 +168,12 @@ If two areas or two quotes bear on one requirement, state that as a fact, with n
 | Any other product behavior | Whoever decides the product's behavior |
 
 - Name roles by responsibility. Never name people, even people a source names. Never write "not named".
-- Exactly one role decides each question. One exception: if an answer could make the desired outcome smaller, also name the originator, to confirm that answer.
+- Exactly one role decides each question. If an answer could make the desired outcome smaller, you may also name the originator, but only to confirm that answer.
 
 **How to build questions.**
 
-- **Area questions.** Each role gets one question for all of its areas. The question has one numbered part per area, by its A id. Each part asks which policies or laws apply, and what they require. The question does not restate a clause or cite it by number, because the area already quotes it.
+- **Area questions.** Each role gets one question for all of its areas. The question has one numbered part per area, by its A id. Each part asks which policies or laws apply, and what they require. Only area questions combine different subjects in this way.
+- No question restates a clause or cites it by number, because the area already quotes it.
 - **Other questions.** Each question asks for one decision. Exception: when one role decides several things about one subject (a screen, a message, a record, or a case) in one tier, make one question with numbered parts. Each part has its own likely answers. Example: "Receipt after a refund: 1. who gets it (a. the payer; b. the account holder); 2. whether it gives the reason (a. yes; b. no)".
 - Each numbered part names its own case, and what changes for that case. Never fold one case into a broader part.
 - Never put different subjects, different roles, or different tiers into one question.
@@ -196,12 +197,12 @@ If two areas or two quotes bear on one requirement, state that as a fact, with n
 
 Use the headings of [references/spec-template.md](references/spec-template.md) in order, and fill in its placeholders.
 
-Write in the intent's language. Always keep these in English: headings, ids, field names such as `Status:`, `Affects:`, `Policy text:`, and `Confirm in:`, markers, and `None.`. If the spec is not in English, translate these faithfully: the notes under "What this work touches" and "Open questions", the four labels of each question (What is unclear, Depends on the answer, To resolve, Who answers), the Sources summary, and the sentence for an area with no policy document.
+Write in the intent's language. Always keep these in English: headings, ids, markers, `None.`, the field names (`Intent:`, `Supersedes:`, `Status:`, `Affects:`, `Policy text:`, `Confirm in:`, and the other labels in the template), and the words `Outcome` and `Question` that start the lines under "From the intent". The only labels you translate are the four listed next. If the spec is not in English, translate these faithfully: the notes under "What this work touches" and "Open questions", the four labels of each question (What is unclear, Depends on the answer, To resolve, Who answers), the Sources summary, and the sentence for an area with no policy document.
 
 What each section holds:
 
 - **Requirements**: each requirement is one behavior that someone outside the build can check. Quote a message's exact wording only when someone decided that wording or depends on it; otherwise give its meaning. Each "then" names a value, a state, the meaning of a message, or what the observer can do next. Where the intent says that a behavior follows a policy, say so in the intent's words.
-- **Changes to existing behavior**: one bullet for each behavior in use today that changes. When the new behavior needs Given/when/then cases, write "see R<n> (Short name)" after "After:".
+- **Changes to existing behavior**: one bullet for each behavior in use today that changes. When the new behavior needs Given/when/then scenarios, write "see R<n> (Short name)" after "After:".
 - **What this work touches**: the template's note, then the areas, grouped by role.
 - **Constraints**: only limits that this work could break. A limit comes from a system or a contract, or is set by the intent.
 - **Open questions**: the template's note, then the questions. Keep each line to one or two sentences. "To resolve" names the concrete decision or check, not just "choose a or b". A question of fact says what each likely result would build.
@@ -232,11 +233,11 @@ A pass means only this: the ids, references, counts, and quotes resolve, and the
 
 ### 7. Check with a fresh reader
 
-You cannot run the test for a finished spec on your own draft, because you fill gaps from what you have read without noticing. So give spec.md and the intent, and nothing else, to one fresh subagent, once. Use a different model if one is available. Send this request:
+You cannot run the test for a finished spec on your own draft, because you fill gaps from what you have read without noticing. So give the spec file and the intent, and nothing else, to one fresh subagent, once. Use a different model if one is available. Send this request:
 
 > You will build from this spec, and you cannot ask anyone. List at most 10 findings, most important first. Give each finding the id (R, A, C, or Q) it is about. Report only findings of these kinds:
 >
-> 1. A choice you would have to make yourself that a user, a stakeholder, or another system would notice. Give literal values, and what each of them would see.
+> 1. A choice you would have to make yourself that a user, a stakeholder, or another system would notice. Give literal values, and what each person or system would see.
 > 2. A sentence that decides something the intent does not decide, with no marker or named item behind it. Quote the sentence.
 > 3. A sentence outside Open questions that settles a value an open question asks about. This includes a sentence that puts a case on one side of that value, as words like "under", "within", "up to", or "or more" do.
 > 4. A requirement that applies, reads, or works out a policy or a law, instead of leaving it to its area's question.

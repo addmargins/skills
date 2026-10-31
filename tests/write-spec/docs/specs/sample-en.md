@@ -31,7 +31,7 @@ A patient must be able to move an appointment up to 3 hours before it starts to 
 - Today: the app's cancel button shows only the call center number, and desk staff cancel and enter the refund (current behavior, S1 (Booking cancellation)). After: see R1 (Cancel in the app). Affects: app patients, call center, branch desks. Can be undone: refunds already made stay made.
 
 ## What this work touches
-This work changes each area below, and policies or laws often govern areas like these. For each area, the named role confirms which policies or laws apply and what they require. A quoted clause is only a starting point for that role; this spec does not interpret it. Rules kept outside this workspace may also govern any area.
+This work changes each area below, and policies or laws often govern areas like these. For each area, the named role confirms which policies or laws apply and what they require. A quoted clause is only a starting point for that role; this spec does not interpret it. Other rules, inside or outside this workspace, may also govern any area.
 
 ### Finance team lead, or whoever owns the deposit and refund policy
 - A1. Deposit refunds made by the app

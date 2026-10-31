@@ -1,4 +1,4 @@
-# Spec: <Title. Name it after the result, not after a method.>
+# Spec: <Title. Name it after the outcome, not after a method.>
 
 Intent: <file name of the accepted intent>
 
@@ -11,7 +11,7 @@ Status: <number> to decide before building, <number> that can wait for planning.
 
 ## Roles
 <Name roles by responsibility, never people. Say what each one decides or confirms.>
-- Originator (<their role, from the intent>): <confirms that the problem is solved, and answers for From the intent>.
+- Originator (<their role, from the intent>): <confirms that the problem is solved, and answers for "From the intent">.
 - <Role that confirms the rules of an area>: <its A items>.
 - Technical lead for <system>: <design constraints, and the facts they depend on>.
 - Product owner for <product>, or whoever decides its behavior: <scope, and behavior that no other role decides>.
@@ -22,13 +22,13 @@ Status: <number> to decide before building, <number> that can wait for planning.
 <"Must" sentences: what the actor or another system observes. Write each value in its source's words. For a value that a policy sets, name the Q that sets it instead.>
 
 - Given <situation, with real values, or the Q that sets each one>, when <action>, then <what is seen or returned, with real values, or the Q that sets each one>.
-- <Add another case only (a) when its result does not follow from the rule above, or (b) for each threshold that the spec states: a case at the exact value, with the result on each side of it.>
+- <Add another scenario only (a) when its result does not follow from the rule above, or (b) for each threshold that the spec states: a scenario at the exact value, with the result on each side of it.>
 
 ## Changes to existing behavior
 - Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, which data, or which integrations>. Can be undone: <yes; or what cannot be undone, such as money already paid>.
 
 ## What this work touches
-This work changes each area below, and policies or laws often govern areas like these. For each area, the named role confirms which policies or laws apply and what they require. A quoted clause is only a starting point for that role; this spec does not interpret it. Rules kept outside this workspace may also govern any area.
+This work changes each area below, and policies or laws often govern areas like these. For each area, the named role confirms which policies or laws apply and what they require. A quoted clause is only a starting point for that role; this spec does not interpret it. Other rules, inside or outside this workspace, may also govern any area.
 
 ### <Role that confirms the rules for these areas>
 - A1. <Area, in plain words, such as "Bank details kept for payouts">
@@ -53,7 +53,7 @@ Everything outside these questions is decided. Questions under "Decide before bu
 <First each role's area question, then each question that leaves open a case, a step, who qualifies, or a behavior. If there are none, write "None.".>
 
 - Q1. <Short name>
-  - What is unclear: <One sentence that names the open case or slot. For several parts of one item: "1. <case>: <what changes for it>; 2. …", one case per part. For a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require". Give no clause number or quote.>
+  - What is unclear: <One sentence that names the open case or slot. For several parts about one subject: "1. <case>: <what changes for it>; 2. …", one case per part. For a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require". Give no clause number or quote.>
   - Depends on the answer: <For each likely answer: which R or C items change, and how. For areas: the requirements under each area's Affects.>
   - To resolve: <The concrete decision or check that settles it. For a decision: what the decider fixes, such as "who receives the receipt after a refund". For a fact: the record to check, where it is, and why it was not checked here. For areas: the role names the rules that govern each area, and confirms or corrects its quotes. Never only "choose a or b".>
   - Who answers: <The role, as named under Roles. For an area question: the role in the area's ### heading under What this work touches.>
