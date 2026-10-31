@@ -25,7 +25,7 @@ Status: <number> to decide before building, <number> that can wait for planning.
 - <Add another scenario only (a) when its result does not follow from the rule above, or (b) for each threshold that the spec states: a scenario at the exact value, with the result on each side of it.>
 
 ## Changes to existing behavior
-- Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, which data, or which integrations>. Can be undone: <yes; or what cannot be undone, such as money already paid>.
+- Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, which data, or which integrations>. Can be undone: <whether this change can be switched back after release, and what stays done if it is, such as money already paid. This is not about whether a user can undo their own action; that belongs in a requirement or an open question.>.
 
 ## What this work touches
 This work changes each area below, and policies or laws often govern areas like these. For each area, the named role confirms which policies or laws apply and what they require. A quoted clause is only a starting point for that role; this spec does not interpret it. Other rules, inside or outside this workspace, may also govern any area.

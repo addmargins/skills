@@ -41,7 +41,7 @@ This skill often runs as an automated job, with nobody to ask. Even when a perso
   - `(current behavior, S<n> (Name))`: for existing behavior that you checked yourself.
 - A marker covers the whole sentence it ends. A sentence that names the item it follows from needs no marker, for example "the amount Q1 sets" or "as S4 (Data retention decision) records". An S item named this way is never a policy or a law.
 - If you draw a new boundary inside a decision that someone recorded, the boundary is a new open question.
-- Write each value in its source's words: "a threshold of 50", not "under 50" or "within 50". Words such as "under" decide which side of the value a case falls on. Use them only if the source says which side.
+- Write each value in its source's words: "a threshold of 50", not "under 50" or "within 50". Words such as "under" decide which side of the value a case falls on. Use them only if the source says which side. When the source's own words already say it, as "up to 3 hours before" does, keep those words: the case at the exact value is settled, not a gap.
 - A value that you would suggest is not a decision. It may appear only as a likely answer to a question.
 - Never grant a permission yourself. This covers who may see, export, change, or receive data, and any new permission or access. If no source states it, ask the role that owns the security or privacy rule.
 
@@ -150,6 +150,7 @@ If two areas or two quotes bear on one requirement, state that as a fact, with n
 
 - Name roles by responsibility. Never name people, even people a source names. Never write "not named".
 - Exactly one role decides each question. If an answer could make the desired outcome smaller, you may also name the originator, but only to confirm that answer.
+- An open question that the intent itself lists goes to the originator, even when it is about who may see or get data. The area question still asks the owner of the security or privacy rule what those rules require.
 
 **How to build questions.**
 
