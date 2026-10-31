@@ -1,8 +1,8 @@
-# Spec: <Title. Name it after the outcome, not after a way to reach it.>
+# Spec: <Title. Name it after the result, not after a method.>
 
 Intent: <file name of the accepted intent>
 
-Supersedes: <file name of the earlier spec. Keep this line only when this spec replaces one.>
+Supersedes: <file name of the earlier spec. Keep this line only when this spec replaces one; otherwise delete it.>
 
 Status: <number> to decide before building, <number> that can wait for planning.
 
@@ -11,7 +11,7 @@ Status: <number> to decide before building, <number> that can wait for planning.
 
 ## Roles
 <Name roles by responsibility, never people. Say what each one decides or confirms.>
-- Originator (<their role, from the intent>): <the problem is solved; From the intent>.
+- Originator (<their role, from the intent>): <confirms that the problem is solved, and answers for From the intent>.
 - <Role that confirms the rules of an area>: <its A items>.
 - Technical lead for <system>: <design constraints, and the facts they depend on>.
 - Product owner for <product>, or whoever decides its behavior: <scope, and behavior that no other role decides>.
@@ -22,10 +22,10 @@ Status: <number> to decide before building, <number> that can wait for planning.
 <"Must" sentences: what the actor or another system observes. Write each value in its source's words. For a value that a policy sets, name the Q that sets it instead.>
 
 - Given <situation, with real values, or the Q that sets each one>, when <action>, then <what is seen or returned, with real values, or the Q that sets each one>.
-- <Add another case only when its result does not follow from the rule above. Also add a case at the exact value of each threshold that the spec states, with the result on each side.>
+- <Add another case only (a) when its result does not follow from the rule above, or (b) for each threshold that the spec states: a case at the exact value, with the result on each side of it.>
 
 ## Changes to existing behavior
-- Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, which data, or which integrations>. Can be undone: <yes, or what stays done, such as money already paid>.
+- Today: <what happens now> (current behavior, S<n> (Plain name)). After: <what happens instead, or "see R<n> (Short name)">. Affects: <who, which data, or which integrations>. Can be undone: <yes; or what cannot be undone, such as money already paid>.
 
 ## What this work touches
 This work changes each area below, and policies or laws often govern areas like these. For each area, the named role confirms which policies or laws apply and what they require. A quoted clause is only a starting point for that role; this spec does not interpret it. Rules kept outside this workspace may also govern any area.
@@ -44,10 +44,10 @@ This work changes each area below, and policies or laws often govern areas like 
 
 ## From the intent
 - Outcome "<desired outcome, quoted>": <R<n> (Short name), …>. <For each vague word in it, either: "<word>" means <value>, with its marker; or: "<word>" is set by Q<n>.>
-- Question "<open question from the intent, quoted>": <one of: answered by R<n> (Short name) | answered by Out of scope (<marker>) | carried as Q<n> | open, but every answer builds the same: <why> | no longer applies: <reason>, agreed by <intent originator>, <where>>.
+- Question "<open question from the intent, quoted>": <one of: answered by R<n> (Short name) | answered by Out of scope (<marker>) | carried as Q<n> | open, but every answer builds the same: <why> | no longer applies: <reason>, agreed by <intent originator>, <where that agreement is recorded>>.
 
 ## Open questions
-Everything outside these questions is decided. Questions under "Decide before building" leave open a case, a step, or who qualifies, so they must be answered before building starts. Questions under "Can wait for planning" only fill in a value, a wording, a label, or a format; the plan leaves these blank and fills them in before release. The role under "Who answers" decides. Anyone may settle a question of fact by checking.
+Everything outside these questions is decided. Questions under "Decide before building" leave open a case, a step, who qualifies, money, data, a behavior, or the rules for an area, so they must be answered before building starts. Questions under "Can wait for planning" only fill in a value, a wording, a label, or a format; the plan leaves these blank and fills them in before release. The role under "Who answers" decides. Anyone may settle a question of fact by checking.
 
 ### Decide before building
 <First each role's area question, then each question that leaves open a case, a step, who qualifies, or a behavior. If there are none, write "None.".>
@@ -56,12 +56,12 @@ Everything outside these questions is decided. Questions under "Decide before bu
   - What is unclear: <One sentence that names the open case or slot. For several parts of one item: "1. <case>: <what changes for it>; 2. …", one case per part. For a role's areas: "1. A1 (<name>); 2. A2 (<name>): which policies or laws apply to each, and what they require". Give no clause number or quote.>
   - Depends on the answer: <For each likely answer: which R or C items change, and how. For areas: the requirements under each area's Affects.>
   - To resolve: <The concrete decision or check that settles it. For a decision: what the decider fixes, such as "who receives the receipt after a refund". For a fact: the record to check, where it is, and why it was not checked here. For areas: the role names the rules that govern each area, and confirms or corrects its quotes. Never only "choose a or b".>
-  - Who answers: <The role, as named under Roles. For an area, its role heading.>
+  - Who answers: <The role, as named under Roles. For an area question: the role in the area's ### heading under What this work touches.>
 
 ### Can wait for planning
 <Questions that only fill in a value, a wording, a label, or a format. If there are none, write "None.".>
 
-- Q<n>. <Short name, then the same four lines as above>
+- Q<n>. <Short name, then the same four lines as Q1>
 
 ## Sources
 <details><summary>For engineers: where each cited fact was read (other readers can skip this)</summary>

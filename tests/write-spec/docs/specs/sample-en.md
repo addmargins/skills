@@ -31,7 +31,7 @@ A patient must be able to move an appointment up to 3 hours before it starts to 
 - Today: the app's cancel button shows only the call center number, and desk staff cancel and enter the refund (current behavior, S1 (Booking cancellation)). After: see R1 (Cancel in the app). Affects: app patients, call center, branch desks. Can be undone: refunds already made stay made.
 
 ## What this work touches
-Policies or laws commonly govern each area below that this work changes. The role named confirms which apply and what they require. A quoted clause is a lead, not this spec's reading; rules kept elsewhere may govern any area.
+This work changes each area below, and policies or laws often govern areas like these. For each area, the named role confirms which policies or laws apply and what they require. A quoted clause is only a starting point for that role; this spec does not interpret it. Rules kept outside this workspace may also govern any area.
 
 ### Finance team lead, or whoever owns the deposit and refund policy
 - A1. Deposit refunds made by the app
@@ -53,7 +53,7 @@ Policies or laws commonly govern each area below that this work changes. The rol
 - Question "Whether a patient who moves an appointment may also change the doctor": carried as Q3.
 
 ## Open questions
-Everything outside these questions is decided. Those under "Decide before building" leave open a case, a step, or who qualifies, so they are answered before building starts. Those under "Can wait for planning" only fill a value, a wording, a label, or a format, which the plan leaves blank and fills before release. The role under "Who answers" decides; anyone may settle a fact by checking.
+Everything outside these questions is decided. Questions under "Decide before building" leave open a case, a step, who qualifies, money, data, a behavior, or the rules for an area, so they must be answered before building starts. Questions under "Can wait for planning" only fill in a value, a wording, a label, or a format; the plan leaves these blank and fills them in before release. The role under "Who answers" decides. Anyone may settle a question of fact by checking.
 
 ### Decide before building
 - Q1. Rules for refunds the app makes
@@ -80,7 +80,7 @@ Everything outside these questions is decided. Those under "Decide before buildi
   - Who answers: product owner for the booking app, or whoever decides its behavior.
 
 ## Sources
-<details><summary>For engineers: where each cited fact was read (other readers can skip)</summary>
+<details><summary>For engineers: where each cited fact was read (other readers can skip this)</summary>
 
 - S1. Booking cancellation: src/booking/cancel.ts, cancelBooking.
 - S2. Deposit policy: policies/POL-FIN-007-en.md, section 4.
