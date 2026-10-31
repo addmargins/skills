@@ -1,101 +1,266 @@
 ---
 name: write-spec
-description: Draft a specification (what must be built, and which confirmations from policy owners and other roles the work needs) from an accepted intent document, without interviewing anyone, for stakeholders who are not engineers to read. Every undecided behavior becomes an open question for the role that decides it, marked as one to decide before building or one that can wait for planning.
+description: Write a draft specification from an accepted intent document. The spec says what must be built, and which confirmations are still needed from policy owners and other roles. It is written for readers who are not engineers. The skill does not interview anyone. Each behavior that nobody has decided becomes an open question for the role that decides it, marked either "decide before building" or "can wait for planning".
 argument-hint: <intent file>
 disable-model-invocation: true
 ---
 
 # Write Spec
 
-Turn an accepted intent into spec.md: what to build, and what each role must confirm or decide first, so those roles, most not engineers, can review their part.
+Turn an accepted intent document into a spec file. The spec says two things:
 
-The test for a finished spec: someone working only from spec.md never has to decide a product behavior, or how a policy or law applies, that nobody has decided. Each such gap is an open question for the role that decides it.
+- what to build;
+- what each role must confirm or decide before that.
 
-This skill often runs as a job, with nobody to ask, and even an invoker is rarely the decider. So a draft asks nobody and settles only what the sources settle; the rest become open questions, which one run does not answer. The skill ends with the saved spec.
+Most of these roles are not engineers. Each role must be able to find and review its own part.
+
+**The test for a finished spec.** A builder who reads only the spec never has to decide, alone:
+
+- a product behavior that nobody has decided; or
+- how a policy or a law applies.
+
+Each such gap becomes an open question for the role that decides it.
+
+This skill often runs as an automated job, with nobody to ask. Even when a person starts it, that person is rarely the one who decides. So:
+
+- Do not ask anyone anything while you draft.
+- Write as decided only what the sources decide. Everything else becomes an open question. This run does not answer the open questions.
+- The skill ends when the spec is saved.
+
+## Terms used in this skill
+
+- **Intent**: the accepted intent document that the spec is built from.
+- **Source**: a workspace file you read, such as the intent, an earlier spec, an ADR, a glossary, a policy document, or code.
+- **Role**: a responsibility, such as "finance team lead". A role is never a person's name.
+- **Originator**: the role that raised the intent.
+- **Builder**: whoever later builds from the spec.
+- **Item**: anything in the spec with an id: R (requirement), A (area), C (constraint), Q (open question), S (source).
+- **Area**: a part of the work that policies or laws often govern, such as personal data or refunds (step 3).
+- **Open question**: a decision or a fact that the spec leaves open, for one role to answer (step 4).
+- **Tier**: each open question is in one of two tiers, "Decide before building" or "Can wait for planning" (step 4).
+- **Slot**: a blank in a requirement that a "Can wait for planning" question fills in: a value, a wording, a label, or a format.
+- **Marker**: a note in parentheses at the end of a sentence that says where the sentence comes from (Principle 1).
+- **Current behavior**: what the existing system does today, as you saw it in the code.
+- **Plan**: the engineering document, written later, that says how to build the spec. This skill does not write it.
 
 ## Principles
 
-- **Decisions are people's, not yours.** Every value, default, limit, and exclusion comes from the intent, a workspace source other than a policy or law, or the role that decides it. A value a policy sets is quoted only on its area's Policy text line; Requirements, Changes, and Constraints name the question that sets it instead, as in "the refund Q3 sets". Mark each one not taken from the intent: `(decided by <role>, <file>)` only for a decision recorded in the spec this one supersedes; `(current behavior, S<n> (Name))` for existing behavior you verified. A marker covers the sentence it ends; a sentence naming the item it follows from needs none. A boundary you draw inside someone's recorded decision is a new question. Give a value in its source's words ("a threshold of 50", not "under 50" or "within 50") unless the source says which side of it a case falls. A value you would propose is only a question's likely answer. Who may see, export, change, or receive data, and any new permission or access, is never yours to grant: unless a source states it, ask the owner of the security or privacy rule.
-- **Facts are yours to find; policies and laws are not yours to read.** Read the workspace for how things work today: ADRs, a `GLOSSARY.md`, policy documents, the code. Cite current behavior only for what you saw the code do in the case the sentence is about. Prose names code in plain words ("booked", not BOOKED), cited as S<n> (Name); code names go only under Sources. Ask a question of fact only when you could not check it, and say why. A fact you give a decider is computed from the workspace or says what it depends on; never write "most" unless you counted. Which policies or laws apply, and what they require, is for the roles that own them (step 3).
-- **What, not how.** The spec states what an actor or another system observes, and the limits the work must stay within. Modules, files, types, and algorithms belong to the plan. Fix an interface or data format only when someone outside this build depends on it: what it is for, then a sample or a link to its schema. Write a lifecycle as a table of state, event, next state, and who sees what.
-- **Plain words, one term per concept.** Use the glossary's terms, else the intent's. Define a new term where it first appears. Outside Sources, replace engineering words such as API or null with what they mean. A term whose meaning stakeholders disagree on is an open question.
-- **Compact.** Say each thing once, in the section the template gives it. Omit an empty section, except Changes to existing behavior and Open questions, which say "None.". Add no sections the template lacks.
+### 1. Decisions belong to people, not to you
+
+- Every value, default, limit, and exclusion must come from one of these:
+  - the intent;
+  - a workspace source that is not a policy or a law;
+  - the role that decides it, through an open question.
+- A value that a policy sets appears in one place only: quoted on the "Policy text" line of its area. In Requirements, Changes to existing behavior, and Constraints, do not write the value. Name the question that sets it instead, for example "the refund that Q3 sets".
+- Mark each decision that does not come from the intent. Put the marker at the end of the sentence. There are two markers:
+  - `(decided by <role>, <file>)`: only for a decision recorded in the earlier spec that this spec supersedes.
+  - `(current behavior, S<n> (Name))`: for existing behavior that you checked yourself.
+- A marker covers the whole sentence it ends. A sentence that names the item it follows from, such as "the amount Q1 sets", needs no marker.
+- If you draw a new boundary inside a decision that someone recorded, the boundary is a new open question.
+- Write each value in its source's words: "a threshold of 50", not "under 50" or "within 50". Words such as "under" decide which side of the value a case falls on. Use them only if the source says which side.
+- A value that you would suggest is not a decision. It may appear only as a likely answer to a question.
+- Never grant a permission yourself. This covers who may see, export, change, or receive data, and any new permission or access. If no source states it, ask the role that owns the security or privacy rule.
+
+### 2. Facts are yours to find; policies and laws are not yours to interpret
+
+- Read the workspace to learn how things work today: ADRs, a `GLOSSARY.md`, policy documents, the code.
+- Cite current behavior only for what you saw the code do, in the same case the sentence is about.
+- In prose, name code in plain words ("booked", not BOOKED), and cite it as S<n> (Name). Code names appear only under Sources.
+- Ask a question of fact only when you could not check the fact yourself. Say why you could not.
+- A fact you give to a decider is either computed from the workspace, or it says what it depends on. Never write "most" unless you counted.
+- Which policies or laws apply, and what they require, is for the roles that own them to say (step 3).
+
+### 3. What, not how
+
+- The spec states what a person (an actor) or another system can observe, and the limits the work must stay within.
+- Modules, files, types, and algorithms belong to the plan.
+- Fix an interface or a data format only when someone outside this build depends on it. Then say what it is for, and give a sample or a link to its schema.
+- Write a lifecycle as a table with four columns: state, event, next state, and who sees what.
+
+### 4. Plain words, one term for each idea
+
+- Use the glossary's terms. If the glossary has no term for an idea, use the intent's term.
+- Define each new term where it first appears.
+- Outside Sources, replace engineering words such as "API" or "null" with what they mean.
+- If stakeholders disagree about what a term means, that is an open question.
+
+### 5. Short
+
+- Say each thing once, in the section that the template gives it.
+- Leave out each section that has nothing in it. Exception: "Changes to existing behavior" and "Open questions" always stay, and say "None." when they are empty.
+- Do not add sections that the template does not have.
 
 ## Steps
 
 ### 1. Read the intent and the workspace
 
-Take the intent file from the arguments or the message. If none is named, list `docs/intents/` and stop rather than guess. If the intent is marked `Superseded by:`, use the one it names. If it has no settled problem or desired outcome, or its outcome can't be checked, stop and suggest `clarify-intent`: open questions in a spec can't repair an intent.
+1. Take the intent file from the arguments or the message. If no file is named, list `docs/intents/` and stop. Do not guess.
+2. If the intent says `Superseded by:`, use the intent it names.
+3. Check the intent. Stop and suggest `clarify-intent` if:
+   - it has no settled problem or no settled desired outcome; or
+   - its outcome cannot be checked.
 
-Read the specs in `docs/specs/`. If one is already built on this intent, stop and say which: people edit that spec themselves, and a changed intent gets a new spec. If one is built on an intent this one supersedes, this spec supersedes it (step 8). Then read what the intent touches.
+   Open questions in a spec cannot repair an intent.
+4. Read the specs in `docs/specs/`.
+   - If a spec is already built on this intent, stop and say which one. People edit that spec themselves, and a changed intent gets a new spec.
+   - If a spec is built on an intent that this intent supersedes, your spec supersedes that spec (step 8).
+5. Read the parts of the workspace that the intent touches.
 
 ### 2. Find the gaps
 
-Draft the requirements in your head. For each, list what a builder would otherwise decide alone that a user, a stakeholder, or another system would notice. Prompts, not a checklist:
+A gap is a choice that a builder would otherwise make alone, and that a user, a stakeholder, or another system would notice.
 
-- scope boundaries a reader might expect covered;
-- values, defaults, limits, and thresholds, the behavior on both sides of each, and none at all, such as no permission;
+Draft the requirements in your head. For each one, list its gaps. These prompts give ideas; they are not a checklist:
+
+- scope boundaries that a reader might expect to be covered;
+- values, defaults, limits, and thresholds: the behavior on each side of each one, and when there is none at all, such as no permission;
 - each vague word in an outcome, such as "soon": the value it stands for;
-- which inputs count as each action, which item an input means when more than one fits, and what each actor sees or receives after it, including nothing;
-- the same person acting again or reversing their action, and a record corrected after someone was told;
-- a message that promises a person will act: who, what they see, and by when;
-- what each actor sees when something the work relies on fails, and for things under way at go-live;
-- existing users, records, and integrations: what each sees change;
-- a limit of a system or contract the work could break.
+- which inputs count as each action; which item an input means when more than one fits; what each actor sees or receives afterwards, including nothing;
+- the same person acting again, or undoing their action; a record that is corrected after someone was already told about it;
+- a message that promises that a person will do something: who, what they will see, and by when;
+- what each actor sees when something the work depends on fails; what happens to things that are in progress at go-live;
+- existing users, records, and integrations: what each one sees change;
+- a limit of a system or a contract that the work could break.
 
-Two people acting at once, rollback, switching off, and moving data over are the plan's, unless an answer changes what someone sees; then ask about that result.
+These are for the plan, not the spec: two people acting at the same time, rollback, switching the work off, and moving data over. Exception: if an answer changes what someone sees, ask about that visible result.
 
-### 3. Name what the work touches
+### 3. Name the areas the work touches
 
-Policies and laws are often outside the workspace or unwritten, so never judge them. From the intent and the code, find each area where this work changes what they commonly govern: personal data collected, shared, kept, or deleted; money paid, refunded, or taxed; notices or messages to customers or the public; permissions and access; records kept or deleted; anything the intent or a workspace document names. For each, name the requirements it affects and the role that confirms which policies or laws apply and what they require. Quote each governing clause of a workspace document word for word, with its number, as a lead; if there is none, say no policy document for this area was found in the workspace, never that none applies.
+Policies and laws are often outside the workspace, or not written down. So you never judge them.
 
-Never decide whether or how a clause applies, whether two conflict, or that none does; never summarize a clause, derive a requirement from one, or take today's code as its answer. Two areas or quotes bearing on one requirement are stated as a fact.
+From the intent and the code, find each area: a place where this work changes something that policies or laws commonly govern. For example:
 
-### 4. Ask the rest
+- personal data that is collected, shared, kept, or deleted;
+- money that is paid, refunded, or taxed;
+- notices or messages to customers or the public;
+- permissions and access;
+- records that are kept or deleted;
+- anything that the intent or a workspace document names.
 
-Address each area and remaining gap to the role responsible: an area to the role owning its rules, as in "privacy officer, or whoever approves new personal data collection", or the owner a quoted document names; a design limit, or a fact only an engineer can check, to the technical lead for that system; what counts as solving the problem, including vague words in the outcome and the intent's own questions, to the originator; a case within another function's work to the role running it; other product behavior to whoever decides the product's behavior. Name roles by responsibility, never people, even those a source names, nor "not named". One role decides each question; name another only to confirm an answer that could narrow the outcome (the originator).
+For each area:
 
-Each role gets one question for all its areas, a numbered part per area by its A id: which policies or laws apply and what they require. No question restates or cites a clause by number; the area quotes it. Any other question asks for one decision, except that what one role decides about one item (a screen, a message, a record, a case), in one tier, is one question in numbered parts, each with its own answers: "Receipt after a refund: 1. who gets it (a. the payer; b. the account holder); 2. whether it gives the reason (a. yes; b. no)". Each numbered part names its own case and what changes for it; never fold one case into a broader part. Never join different items, roles, or tiers. For a choice, give two to four lettered likely answers with their trade-offs, none recommended.
+- Name the requirements it affects.
+- Name the role that confirms which policies or laws apply and what they require.
+- Quote each governing clause of a workspace document, word for word, with its number. A quote is a lead: a starting point for that role, not your reading of the clause.
+- If you find no such clause, write that no policy document for this area was found in the workspace. Never write that no policy applies.
 
-Tier each question. **Can wait for planning** holds only a slot the plan leaves blank and fills before release: a value, a wording, a label, or a format. Everything else is **Decide before building**: every area's question, and any question that leaves open a case, a flow step, who qualifies or is told, an amount of money, what data is kept or shown, or a behavior. When unsure, choose the first. Put area questions first in their tier.
+Never do any of these:
 
-A requirement states only what is decided. It never says that a case or a requirement waits, stays off, or is held: questions under "Decide before building" are answered before building starts. A requirement names a question only where its answer fills a slot. A question whose every likely answer builds the same thing is no gap. Keep the count down by checking facts and combining questions as above, never by leaving a gap or an area out.
+- decide whether or how a clause applies, whether two clauses conflict, or that no clause applies;
+- summarize a clause, or derive a requirement from a clause;
+- treat today's code as the answer to what a policy requires.
+
+If two areas or two quotes bear on one requirement, state that as a fact, with no judgment.
+
+### 4. Ask the rest as open questions
+
+**Who answers.** Send each area and each remaining gap to the role responsible for it:
+
+| The question is about | Who answers |
+|---|---|
+| An area | The role that owns its rules, such as "privacy officer, or whoever approves new personal data collection", or the owner that a quoted document names |
+| A design limit, or a fact that only an engineer can check | The technical lead for that system |
+| What counts as solving the problem, including vague words in the outcome and the intent's own open questions | The originator |
+| A case inside the work of another function, such as support or finance | The role that runs that function |
+| Any other product behavior | Whoever decides the product's behavior |
+
+- Name roles by responsibility. Never name people, even people a source names. Never write "not named".
+- One role decides each question. Name a second role only to confirm an answer that could narrow the outcome; that second role is the originator.
+
+**How to build questions.**
+
+- **Area questions.** Each role gets one question for all of its areas. The question has one numbered part per area, by its A id. Each part asks which policies or laws apply, and what they require. The question does not restate a clause or cite it by number, because the area already quotes it.
+- **Other questions.** Each question asks for one decision. Exception: when one role decides several things about one item (a screen, a message, a record, or a case) in one tier, make one question with numbered parts. Each part has its own likely answers. Example: "Receipt after a refund: 1. who gets it (a. the payer; b. the account holder); 2. whether it gives the reason (a. yes; b. no)".
+- Each numbered part names its own case, and what changes for that case. Never fold one case into a broader part.
+- Never put different items, different roles, or different tiers into one question.
+- For a choice, give two to four likely answers, lettered a, b, c, d, each with its trade-offs. Do not recommend any of them.
+
+**Tiers.** Put each question in one tier:
+
+- **Can wait for planning**: only a question that fills a slot, which the plan leaves blank and fills before release: a value, a wording, a label, or a format.
+- **Decide before building**: every other question. This includes every area question, and every question that leaves open a case, a step in a flow, who qualifies or who is told, an amount of money, what data is kept or shown, or a behavior.
+- If you are not sure, choose "Decide before building".
+- In each tier, put area questions first.
+
+**Requirements and open questions.**
+
+- A requirement states only what is decided. It never says that a case or a requirement waits, is turned off, or is on hold. Every "Decide before building" question is answered before building starts.
+- A requirement names a question only where the answer fills a slot in it.
+- If every likely answer to a question would build the same thing, it is not a gap. Do not ask it.
+- Keep the number of questions low by checking facts yourself and by combining questions as described above. Never do it by leaving out a gap or an area.
 
 ### 5. Write the spec
 
-Use the headings of [references/spec-template.md](references/spec-template.md) in order, filling its placeholders. Write in the intent's language, but keep headings, ids, field names, markers, and `None.` in English. In a spec not in English, translate faithfully the notes under What this work touches and Open questions, the four question labels, the Sources summary, and the sentence for an area with no policy document.
+Use the headings of [references/spec-template.md](references/spec-template.md) in order, and fill in its placeholders.
 
-- **Requirements**: one behavior someone outside can check per requirement. Quote a message's exact wording only when someone decided it or depends on it; otherwise give its meaning. Each "then" names a value, a state, a message's meaning, or what the observer can do next. Where the intent says a behavior follows a policy, say so in its words.
-- **Changes to existing behavior**: one row per behavior in use that changes, pointing to a requirement when it needs scenarios.
-- **What this work touches**: the template's note, then the areas grouped by role.
-- **Constraints**: only limits of a system or contract, or set by the intent, that this work could break.
-- **Open questions**: the template's note, then the questions. Keep each line to a sentence or two. "To resolve" names the concrete decision or check, not just "choose a or b". A question of fact gives what each likely result builds.
-- **Sources**: an appendix for engineers, folded so other readers pass it by.
+Write in the intent's language. Always keep these in English: headings, ids, field names, markers, and `None.`. If the spec is not in English, translate these faithfully: the notes under "What this work touches" and "Open questions", the four labels of each question (What is unclear, Depends on the answer, To resolve, Who answers), the Sources summary, and the sentence for an area with no policy document.
 
-Ids are stable within a spec and across one that supersedes it: never renumber; a removed item leaves a gap. Cite an item by id and current name, as in `R2 (Weekly limit)`.
+What each section holds:
 
-Then trace each "must" sentence in Requirements and Changes to existing behavior to the intent's words, current behavior that stays as it is, the spec this one supersedes, or a named item, never to a policy. Current behavior never settles a case this work creates, or what a policy or law requires. Cut what you cannot trace, even what the intent seems to lean toward or a quoted clause seems to say, and ask it as step 4 says.
+- **Requirements**: each requirement is one behavior that someone outside the build can check. Quote a message's exact wording only when someone decided that wording or depends on it; otherwise give its meaning. Each "then" names a value, a state, the meaning of a message, or what the observer can do next. Where the intent says that a behavior follows a policy, say so in the intent's words.
+- **Changes to existing behavior**: one row for each behavior in use today that changes. Point to a requirement when the change needs scenarios.
+- **What this work touches**: the template's note, then the areas, grouped by role.
+- **Constraints**: only limits that this work could break. A limit comes from a system or a contract, or is set by the intent.
+- **Open questions**: the template's note, then the questions. Keep each line to one or two sentences. "To resolve" names the concrete decision or check, not just "choose a or b". A question of fact says what each likely result would build.
+- **Sources**: an appendix for engineers, folded so that other readers can skip it.
+
+Ids:
+
+- Ids stay the same within a spec, and in a later spec that supersedes it. Never renumber. A removed item leaves a gap in the numbers.
+- Cite an item by its id and its current name, for example `R2 (Weekly limit)`.
+
+Then trace each "must" sentence in Requirements and in Changes to existing behavior. Each one must come from one of these:
+
+- the intent's words;
+- current behavior that stays as it is;
+- the spec that this spec supersedes;
+- a named item.
+
+It must never come from a policy. Current behavior never settles a case that this work creates, or what a policy or law requires. Cut each sentence you cannot trace, even one the intent seems to lean toward or a quoted clause seems to say. Ask it as an open question instead, as step 4 says.
 
 ### 6. Check the form
 
-Run `node <this skill's directory>/scripts/check-spec.mjs <spec file>` and fix what it prints until it prints only "not verified" lines. Passing means its ids, references, counts, and quotes resolve and prose has no backticks or workspace paths, not that the spec is good. If a line is wrong about the spec, don't change correct text to silence it; say so in your final message. If node is not installed, say in your final message that the check did not run, never that it passed.
+Run `node <this skill's directory>/scripts/check-spec.mjs <spec file>`. Fix what it prints, and run it again, until it prints only "not verified" lines.
+
+A pass means only this: the ids, references, counts, and quotes resolve, and the prose has no backticks or workspace paths. It does not mean the spec is good.
+
+- If a printed line is wrong about the spec, do not change correct text just to silence it. Say so in your final message.
+- If node is not installed, say in your final message that the check did not run. Never say that it passed.
 
 ### 7. Check with a fresh reader
 
-You can't run the spec's test yourself: you fill gaps from what you read without noticing. Once per draft, give spec.md and the intent, and nothing else, to one fresh subagent, on a different model when one is available, with this request:
+You cannot run the spec's test yourself, because you fill gaps from what you have read without noticing. So, once per draft, give spec.md and the intent, and nothing else, to one fresh subagent. Use a different model if one is available. Send this request:
 
-> You will build from this spec and can't ask anyone. List at most 10 findings, most important first, each with its R, A, C, or Q id: a choice you would make yourself that a user, a stakeholder, or another system would notice, with literal values and what each would see; a quoted sentence deciding something the intent does not, with no marker or named item behind it; a sentence outside Open questions that settles a value an open question asks about, including one that puts a case on one side of that value, as "under", "within", "up to", or "or more" do; a requirement that applies, reads, or works out a policy or law instead of leaving it to its area's question; or a change to personal data, money, notices, access, or records that "What this work touches" leaves out. Don't list what an open question already asks, unless another sentence answers it. Leave out how to build it and failures nobody outside sees.
+> You will build from this spec, and you cannot ask anyone. List at most 10 findings, most important first. Give each finding the id (R, A, C, or Q) it is about. Report only findings of these kinds:
+>
+> 1. A choice you would have to make yourself that a user, a stakeholder, or another system would notice. Give literal values, and what each of them would see.
+> 2. A sentence that decides something the intent does not decide, with no marker or named item behind it. Quote the sentence.
+> 3. A sentence outside Open questions that settles a value an open question asks about. This includes a sentence that puts a case on one side of that value, as words like "under", "within", "up to", or "or more" do.
+> 4. A requirement that applies, reads, or works out a policy or a law, instead of leaving it to its area's question.
+> 5. A change to personal data, money, notices, access, or records that "What this work touches" leaves out.
+>
+> Do not list what an open question already asks, unless another sentence answers it. Leave out how to build it, and failures that nobody outside would see.
 
-Sort each finding:
+Sort each finding into one of three kinds:
 
-- **Settled but not written**: a workspace file and line, not a policy or law, settles it. Write it in with its marker.
-- **Not a gap**: an item's words cover that very case, it can't happen given current behavior the spec states, or only builders would notice. Drop it, but never a likely answer.
-- **A gap, a sentence that decides too much, or a missed area**: cut each sentence back to what its source settles, add the area as step 3 says, and ask the rest as step 4 says. Never fill a gap yourself, and never add a marker whose source does not settle the sentence.
+- **Settled but not written**: a workspace file and line settles it, and that file is not a policy or a law. Write it into the spec with its marker.
+- **Not a gap**: an item's words cover that exact case; or the case cannot happen, given current behavior that the spec states; or only builders would notice it. Drop the finding. But never drop a likely answer from a question.
+- **A gap, a sentence that decides too much, or a missed area**: cut each sentence back to what its source settles. Add a missed area as step 3 says. Ask the rest as step 4 says. Never fill a gap yourself. Never add a marker whose source does not settle the sentence.
 
-Don't ask a second reader. Run step 6 again, then re-read each line you changed against the test at the top.
+Do not ask a second reader. Run step 6 again. Then re-read each line you changed, against the test for a finished spec at the top of this skill.
 
 ### 8. Save
 
-Save in the workspace's `docs/specs/`, the one closest to the intent if there are several, or a new one next to its `docs/intents/`; a superseding spec goes in the earlier spec's directory. Name it `NNNN-<slug>.md`: the next unused four-digit number there, from `0001`, and a short kebab-case English slug. A superseding spec fills in `Supersedes`. Change no other file, the earlier spec included. If you can't write the file, give the spec in your reply.
+- **Folder**: the workspace's `docs/specs/`. If there are several, use the one closest to the intent. If there is none, create one next to the intent's `docs/intents/`. A spec that supersedes another goes in the earlier spec's folder.
+- **File name**: `NNNN-<slug>.md`. NNNN is the next unused four-digit number in that folder, starting from `0001`. The slug is a short English name in kebab-case.
+- A spec that supersedes another fills in `Supersedes:`.
+- Change no other file. This includes the earlier spec.
+- If you cannot write the file, give the spec in your reply.
 
-End with a short message: the spec's path and Status line, then each role that has questions, with their ids and short names in the spec's order, and any quote check-spec could not verify. Never cite its passing as evidence of quality. Do not write the plan.
+End with a short message that gives:
+
+- the spec's path and its Status line;
+- each role that has questions, with the ids and short names of its questions, in the spec's order;
+- any quote that check-spec could not verify.
+
+Never present check-spec's pass as evidence of quality. Do not write the plan.
